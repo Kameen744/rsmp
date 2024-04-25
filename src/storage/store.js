@@ -255,6 +255,8 @@ export const useMainStore = defineStore('useMainStore', {
       
       await this.fetch(url).then(async (res) => {
         this.mapData = res.data
+      }).catch((error) => {
+        console.log(error);
       });
     },
 
@@ -270,8 +272,13 @@ export const useMainStore = defineStore('useMainStore', {
 
     async updateApp() {
       await this.fetchMapData();
-      await this.fetchFacilities();
+      // use again only if state changes
+      // await this.fetchFacilities();
       await this.loadGeoData();
+      await this.mapMarkers.clearLayers();
+      await this.markerGeoJson.clearLayers();
+      await this.geoJson.clearLayers();
+      await this.geoJson.addData(this.mapGeoData);
       await this.createMap();
       await this.createDataPoints();
     },
@@ -373,6 +380,7 @@ export const useMainStore = defineStore('useMainStore', {
     async zoomToMapFeature(e) {
       let dataSet = e.target.feature.properties;
       this.selectedMarker = null;
+      
       if(this.selectedState) {
         dataSet['supports'] = this.mapData.data[dataSet.state][dataSet.LGA];
         this.selectedLgaMarker = dataSet;
@@ -543,7 +551,7 @@ export const useMainStore = defineStore('useMainStore', {
               });
               
               let html;
-              row.status = 'completed';
+              console.log(row.status);
               if(row.status == 'Ongoing') {
                 html = `
                 <div class="shadow-sm w-4 h-4 rounded-full" style="background: ${bg}"></div>
@@ -552,8 +560,7 @@ export const useMainStore = defineStore('useMainStore', {
                 html = `
                 <div class="shadow-sm w-4 h-4" style="background: ${bg}"></div>
                 `
-              }
-              else {
+              } else {
                 html = `
                 <div class="border-solid border-b-[11px] border-x-transparent border-x-[11px] border-t-0" style="border-color: ${bg.bg}"></div>
                 `
@@ -695,9 +702,9 @@ export const useMainStore = defineStore('useMainStore', {
         //   attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
         // }).addTo(this.map);
 
-        // L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
-        //   attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-        // }).addTo(this.map);
+        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+        }).addTo(this.map);
 
         // pk.eyJ1Ijoia2FtZWVuIiwiYSI6ImNsZmNkN29xbjBqOGkzcnBnNmc4Y3ZvNXUifQ.UIK85teOqZAyZ66SZMH0Rg
 

@@ -1,6 +1,6 @@
 <template>
   <template class="min-[3rem]: flex justify-start">
-    <div class="dropdown dropdown-bottom" @click="toggleDroped">
+    <div class="dropdown dropdown-bottom" @click="toggleDroped" @mouseleave="dropped=false">
       <div tabindex="0" role="button" class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec">
         <div class="inline-flex max-w-28 overflow-hidden">
           {{selectedLga? selectedLga: 'LGA'}} 
@@ -40,9 +40,8 @@ const toggleDroped = () => {
   dropped.value = !dropped.value;
 }
 const SelectLga = (lga) => {
-  selectedLga.value = lga.lga;
+  lga ? selectedLga.value = lga.lga : selectedLga.value = lga;
   store.updateApp();
-  toggleDroped();
 }
 const {
   selectedLga, lgas
