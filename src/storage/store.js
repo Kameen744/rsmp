@@ -41,8 +41,8 @@ export const useMainStore = defineStore('useMainStore', {
       'NiCare'
     ],
     selectedSupports: [],
-    selectedStartDate: '2023-01-01',
-    selectedEndDate: '2024-12-31'
+    selectedStartDate: '2020-01-01',
+    selectedEndDate: '2030-12-31'
   }),
 
   actions: {
