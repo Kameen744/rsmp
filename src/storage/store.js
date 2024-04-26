@@ -46,8 +46,7 @@ export const useMainStore = defineStore('useMainStore', {
       'Nutrition',
       'Communicable Diseases'
     ],
-    selectedSupports: [
-    ],
+    selectedSupports: [],
     selectedStartDate: '2024-01-01',
     selectedEndDate: '2024-12-31'
   }),
@@ -525,7 +524,7 @@ export const useMainStore = defineStore('useMainStore', {
             // const randomIndex = Math.floor(Math.random() * arrayOfArrays.length);
           
             lgaObj.forEach(async (row) => {
-              console.log(row);
+        
               let bg = await that.getValFromData(that.supportTypes, 'name', row.type_of_support).bg;
               console.log(bg, ` - ${row.type_of_support}`);
               let len = lgaFacilities.length;
@@ -664,7 +663,7 @@ export const useMainStore = defineStore('useMainStore', {
 
         // Disable zooming using the mouse scroll wheel
         this.map.scrollWheelZoom.disable();
-        this.map.dragging.disable();
+        // this.map.dragging.disable();
         // Disable zooming using the keyboard
         this.map.keyboard.disable();
 
@@ -794,6 +793,8 @@ export const useMainStore = defineStore('useMainStore', {
       // });
       
       this.fitBounds(this.geoJson);
+     
+      this.map.setMaxBounds(this.geoJson.getBounds());
     }
 
   },
