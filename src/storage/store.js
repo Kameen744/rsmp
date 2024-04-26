@@ -36,18 +36,12 @@ export const useMainStore = defineStore('useMainStore', {
     selectedMarker: null,
     selectedLgaMarker: null,
     selectedPartners: [
-      'Management Sciences for Health',
-      'Global Health Supply chain Management'
     ],
     selectedPrograms: [
-      'NiCare', 
-      'Routine Immunization', 
-      'Family Planning', 
-      'Nutrition',
-      'Communicable Diseases'
+      'NiCare'
     ],
     selectedSupports: [],
-    selectedStartDate: '2024-01-01',
+    selectedStartDate: '2023-01-01',
     selectedEndDate: '2024-12-31'
   }),
 
@@ -239,6 +233,7 @@ export const useMainStore = defineStore('useMainStore', {
       let url = `support_duration?state=${this.selectedState}&lga=${this.selectedLga}`
       let partners_param = '&partner=';
       let programs_param = '&program_area=';
+      let support_param = '&support_types=';
 
       this.selectedPartners.forEach((part) => {
         partners_param += `${part},`
@@ -248,8 +243,13 @@ export const useMainStore = defineStore('useMainStore', {
         programs_param += `${part},`
       });
 
+      this.selectedSupports.forEach((sp) => {
+        support_param += `${sp},`
+      });
+
       url += programs_param
       url += partners_param
+      url += support_param
       url += `&cso=${this.cso}`
       url += `&start_date=${this.selectedStartDate}&end_date=${this.selectedEndDate}`
       
