@@ -25,6 +25,7 @@ export const useMainStore = defineStore('useMainStore', {
     markerGeoJson: null,
     today: new Date(),
     mapTLayer: '',
+    mapPointerHTML: '',
     mapInfo: L.control(),
     mapMarkers: null,
     lgaMapMarker: null,
@@ -524,14 +525,30 @@ export const useMainStore = defineStore('useMainStore', {
             // const randomIndex = Math.floor(Math.random() * arrayOfArrays.length);
           
             lgaObj.forEach(async (row) => {
+              console.log(row);
               let bg = await that.getValFromData(that.supportTypes, 'name', row.type_of_support).bg;
+              console.log(bg, ` - ${row.type_of_support}`);
               let len = lgaFacilities.length;
               let randomIndex = Math.floor(Math.random() * len);
               let randFacility = lgaFacilities[randomIndex];
               let randGeo = JSON.parse(randFacility.geometry);
               // let randCords = randGeo.coordinates;
               // let position = L.latLng(randCords[0], randCords[1]);
-              
+              let mhtml = ''
+              if(row.status == 'Ongoing') {
+                mhtml = `
+                <div class="shadow-sm w-4 h-4 rounded-full" style="background: ${bg};"></div>
+                `
+              } else if(row.status == 'Completed') {
+                mhtml = `
+                <div class="shadow-sm w-4 h-4" style="background: ${bg};"></div>
+                `
+              } else {
+                mhtml = `
+                <div class="border-solid border-b-[11px] border-x-transparent border-x-[11px] border-t-0" style="border-color: ${bg.bg}"></div>
+                `
+              }
+
               layerGeoJson.features.push({
                 'type': 'Feature',
                 'properties': {
@@ -545,40 +562,29 @@ export const useMainStore = defineStore('useMainStore', {
                   'end_date': row.end_date,
                   'status': row.status,
                   'duration_in_months': row.duration_in_months,
-                  'remaining_months': row.remaining_months
+                  'remaining_months': row.remaining_months,
+                  'html': mhtml
                 },
                 'geometry': randGeo
               });
               
-              let html;
-              console.log(row.status);
-              if(row.status == 'Ongoing') {
-                html = `
-                <div class="shadow-sm w-4 h-4 rounded-full" style="background: ${bg}"></div>
-                `
-              } else if(row.status == 'completed') {
-                html = `
-                <div class="shadow-sm w-4 h-4" style="background: ${bg}"></div>
-                `
-              } else {
-                html = `
-                <div class="border-solid border-b-[11px] border-x-transparent border-x-[11px] border-t-0" style="border-color: ${bg.bg}"></div>
-                `
-              }
-              let mapMarkerIcon = L.divIcon({
-                className: 'facilities-marker',
-                html: html,
-                popupAnchor: [0, 200]
-              });
-
               if(that.markerGeoJson) {
                 this.markerGeoJson.clearLayers();
               }
 
+              // let mapMarkerIcon = L.divIcon({
+              //   html: that.mapPointerHTML,
+              //   popupAnchor: [0, 200]
+              // });
+              
               that.markerGeoJson = L.geoJSON(layerGeoJson, {
                 pointToLayer: function(feature, latlng) {
                   return L.marker(latlng, {
-                    icon: mapMarkerIcon
+                    icon: L.divIcon({
+                      className: 'facilities-marker',
+                      html: feature.properties.html,
+                      popupAnchor: [0, 200]
+                    })
                   }).on('click', that.markerEvent)
                 }
               }).addTo(that.map);
@@ -650,17 +656,17 @@ export const useMainStore = defineStore('useMainStore', {
         this.map = L.map(this.mapContainerRef);
         // this.map.zoomControl.remove();
 
+        // this.map = L.map(this.mapContainerRef, {
+        //   center: [9.0820, -8.6753],
+        //   zoom: 10,
+        //   layers: [osm, cities]
+        // });
+
         // Disable zooming using the mouse scroll wheel
         this.map.scrollWheelZoom.disable();
         this.map.dragging.disable();
         // Disable zooming using the keyboard
         this.map.keyboard.disable();
-
-        // this.map = L.map(this.mapContainerRef, {
-        //   center: [9.0820, -8.6753],
-        //   zoom: 10
-        //   // layers: [osm, cities]
-        // });
 
         // this.map = L.map(this.mapContainerRef, {
         //   center: [9.0820, -8.6753],
@@ -701,10 +707,12 @@ export const useMainStore = defineStore('useMainStore', {
         //   maxZoom: 19,
         //   attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
         // }).addTo(this.map);
+        
+        
 
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
-          attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
-        }).addTo(this.map);
+        // L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+        //   attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+        // }).addTo(this.map);
 
         // pk.eyJ1Ijoia2FtZWVuIiwiYSI6ImNsZmNkN29xbjBqOGkzcnBnNmc4Y3ZvNXUifQ.UIK85teOqZAyZ66SZMH0Rg
 
@@ -738,6 +746,9 @@ export const useMainStore = defineStore('useMainStore', {
         // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         // }).addTo(this.map);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
+        }).addTo(this.map);
 
         // L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
         //   subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -745,7 +756,7 @@ export const useMainStore = defineStore('useMainStore', {
 
         // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         //   attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-        //   maxZoom: this.mapFit,
+        //   minZoom: 6
         // }).addTo(this.map);
 
         // L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
