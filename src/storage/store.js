@@ -429,17 +429,15 @@ export const useMainStore = defineStore('useMainStore', {
       data.forEach((d) => {
 
         let geoCords = JSON.parse(d.geometry);
-        if(d.lga != 'Mashegu' & d.lga != 'Moya') {
-          this.mapGeoData.features.push({
-            'type': 'Feature',
-            'id': d.lga,
-            'properties': {
-              'state': d.state,
-              'LGA': d.lga
-            },
-            'geometry': geoCords
-          });
-        }
+        this.mapGeoData.features.push({
+          'type': 'Feature',
+          'id': d.lga,
+          'properties': {
+            'state': d.state,
+            'LGA': d.lga
+          },
+          'geometry': geoCords
+        });
       });
     },
 
