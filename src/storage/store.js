@@ -524,28 +524,31 @@ export const useMainStore = defineStore('useMainStore', {
             lgaObj.forEach(async (row) => {
         
               let bg = await that.getValFromData(that.supportTypes, 'name', row.type_of_support).bg;
-              console.log(bg, ` - ${row.type_of_support}`);
+              
               let len = lgaFacilities.length;
               let randomIndex = Math.floor(Math.random() * len);
               let randFacility = lgaFacilities[randomIndex];
               let randGeo = JSON.parse(randFacility.geometry);
-              // let randCords = randGeo.coordinates;
-              // let position = L.latLng(randCords[0], randCords[1]);
               let mhtml = ''
+            
               if(row.status == 'Ongoing') {
                 mhtml = `
-                <div class="shadow-sm w-4 h-4 rounded-full" style="background: ${bg};"></div>
+                <div class="shadow-sm w-3 h-3 rounded-full" style="background: ${bg};"></div>
                 `
               } else if(row.status == 'Completed') {
                 mhtml = `
-                <div class="shadow-sm w-4 h-4" style="background: ${bg};"></div>
+                <div class="shadow-sm w-3 h-3" style="background: ${bg};"></div>
                 `
               } else {
                 mhtml = `
-                <div class="border-solid border-b-[11px] border-x-transparent border-x-[11px] border-t-0" style="border-color: ${bg.bg}"></div>
+                <b class="w-0 h-0 
+                  border-l-[10px] border-l-transparent
+                  border-b-[15px] border-b-[${bg}]
+                  border-r-[10px] border-r-transparent">
+                </b>
                 `
               }
-
+              // console.log(mhtml)
               layerGeoJson.features.push({
                 'type': 'Feature',
                 'properties': {
