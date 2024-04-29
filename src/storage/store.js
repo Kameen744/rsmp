@@ -112,6 +112,7 @@ export const useMainStore = defineStore('useMainStore', {
     initChart() {
       var t = this;
       var mainCont = document.createElement('div');
+      t.chartMainContainerRef.innerHTML = '';
       for(let i=0; i<=t.chartDataKeys.length; i++) {
         let progArea = t.chartDataKeys[i];
         if (progArea) {
