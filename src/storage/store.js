@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import Chart from 'chart.js/auto'
 import axios from "axios";
-
+Chart.defaults.datasets.bar.maxBarThickness = 25;
 
 export const useMainStore = defineStore('useMainStore', {
   state: () => ({
@@ -19,6 +19,7 @@ export const useMainStore = defineStore('useMainStore', {
     mapData: {},
     chartData:null,
     chartMainContainerRef: null,
+    chartMainContainerCSORef: null,
     chartDataKeys: null,
     chartCleanedData: [],
     mapGeoData: Object,
@@ -108,62 +109,148 @@ export const useMainStore = defineStore('useMainStore', {
       }
     },
 
+    initChart() {
+      var t = this;
+      var mainCont = document.createElement('div');
+      for(let i=0; i<=t.chartDataKeys.length; i++) {
+        let progArea = t.chartDataKeys[i];
+        if (progArea) {
+          let rawData = t.mapData[t.view]['data'][progArea];
+          let chartData = t.createChartData(rawData);
+          let partners = Object.keys(chartData);
+          let chartDiv = document.createElement('div');
+          let chartTitle = document.createElement('h3');
+          
+          let patnerChartDiv = document.createElement('div');
+          let chartOption = t.getChartJsOptions(30);
+          
+          chartDiv.className = 'bg-white p-4 mb-3 overflow-x-scroll';
+          patnerChartDiv.className = 'flex h-full';
+          chartTitle.className = 'text-lg pb-3 font-bold';
+          chartTitle.innerText = progArea;
+          
+    
+          chartDiv.appendChild(chartTitle);
+          
+          partners.forEach((partner) => {
+            let chartCanvas = document.createElement('canvas');
+            let patSpt = chartData[partner];
+            let c = document.createElement('div');
+            chartCanvas.className = `flex-none flex-auto max-w-[300px] max-h-[250px]`;
+           
+            // c.className = `min-w-[${patSpt.length * 50}px]`
+            // c.style.width = `${patSpt.length * 5}px]`
+            c.style.backgroundColor = patSpt[0].bg;
+            c.style.margin = '10px';
+          
+            // c.innerHTML = partner + ` ${patSpt[0].bg}`
+            // chartCanvas.style.width = '100%';
+            // chartCanvas.style.height = '100%';
+            
+            let ctDatSet = {
+              type: 'bar',
+              data: {
+                labels: [partner],
+                datasets: []
+              },
+              options: chartOption
+            }
+
+            for(let k=0; k < patSpt.length; k++) {
+              let spDt = patSpt[k];
+              ctDatSet.data.datasets.push({
+                label: spDt.support,
+                backgroundColor: spDt.bg,
+                data: [spDt.lgas_sp],
+                borderWidth: 1
+              });
+            }
+            
+            new Chart(chartCanvas, ctDatSet);
+            // t.chartMainContainerRef.appendChild(chartCanvas);
+            // c.appendChild(chartCanvas);
+            patnerChartDiv.appendChild(chartCanvas);
+            // console.log(ctObj);
+            // console.log(patSpt);
+          });
+          
+          // chartDiv.appendChild(chartCanvas);
+          chartDiv.appendChild(patnerChartDiv);
+          t.chartMainContainerRef.appendChild(chartDiv);
+        }
+      }
+    }, 
+
     createChartData(data) {
       var t = this
       const labels = Object.keys(data.partners);
       const dataSets = []
       const dataSetData = []
       const supportTypes = {}
+      const charts = {}
 
       for(let a = 0; a < labels.length; a++) {
         let pdt = labels[a];
         let spTypes = Object.keys(data.partners[pdt]);
-        
         for(let b = 0; b < spTypes.length; b++) {
           const spt = spTypes[b];
           const supportData = data.partners[pdt][spt]
+          const bg = t.getValFromData(t.supportTypes, 'name', spt);
           t.chartCleanedData.push({
             'partner': pdt,
             'support': spt,
             'lgas_sp': supportData.lgas_supported,
             'status': supportData.status,
+            'bg': bg.bg
           });
         }
       };
-      let checkIfLabelExists  = (label) => {
-        for(let j = 0; j < dataSets.length; j++) {
-          if(dataSets[j]['label'] == label) {
-            return j;
-          } else {
-            return false;
-          }
-        }
-      }
-      t.chartCleanedData.forEach((d) => {
-        let patIndx = labels.indexOf(d.partner);
-        // dataSetData[labelIndex] = d.lgas_sp;
-        let dtObj = t.getDataObjAndColor(d.support, d.status);
-        dtObj['data'][patIndx] = 0;
-        if(dataSets.length <= 0) {
-          dtObj['data'][patIndx] = d.lgas_sp;
-          dataSets.push(dtObj);
-        } else {
-          // dtObj['data'] = [d.lgas_sp];
-          let exPatInd = checkIfLabelExists(d.support);
 
-          if(exPatInd) {
-            dataSets[exPatInd]['data'][patIndx] = d.lgas_sp;
-          } else {
-            dtObj['data'][patIndx] = d.lgas_sp;
-            dataSets.push(dtObj);
-          }
-        }
+      labels.forEach((lb) => {
+        var filteredArray = t.chartCleanedData.filter(function(obj) {
+            return obj.partner === lb;
+        });
+        charts[lb] = filteredArray;
       });
-      // console.log(dataSets);
-      return {
-        labels: labels,
-        datasets: dataSets
-      }
+      
+      return charts;
+      // console.log(charts);
+
+      // let checkIfLabelExists  = (label) => {
+      //   for(let j = 0; j < dataSets.length; j++) {
+      //     if(dataSets[j]['label'] == label) {
+      //       return j;
+      //     } else {
+      //       return false;
+      //     }
+      //   }
+      // }
+
+      // t.chartCleanedData.forEach((d) => {
+      //   let patIndx = labels.indexOf(d.partner);
+      //   // dataSetData[labelIndex] = d.lgas_sp;
+      //   let dtObj = t.getDataObjAndColor(d.support, d.status);
+      //   dtObj['data'][patIndx] = 0;
+      //   if(dataSets.length <= 0) {
+      //     dtObj['data'][patIndx] = d.lgas_sp;
+      //     dataSets.push(dtObj);
+      //   } else {
+      //     // dtObj['data'] = [d.lgas_sp];
+      //     let exPatInd = checkIfLabelExists(d.support);
+
+      //     if(exPatInd) {
+      //       dataSets[exPatInd]['data'][patIndx] = d.lgas_sp;
+      //     } else {
+      //       dtObj['data'][patIndx] = d.lgas_sp;
+      //       dataSets.push(dtObj);
+      //     }
+      //   }
+      // });
+      // // console.log(dataSets);
+      // return {
+      //   labels: labels,
+      //   datasets: dataSets
+      // }
     },
 
     getChartJsOptions(max) {
@@ -179,7 +266,7 @@ export const useMainStore = defineStore('useMainStore', {
         scales: {
           y: {
             beginAtZero: true,
-            suggestedMax: 30,
+            suggestedMax: max,
           },
           x: {
             categoryPercentage: 0.7 // Adjust as needed (default: 0.8)
@@ -312,6 +399,7 @@ export const useMainStore = defineStore('useMainStore', {
         );
         
         this.chartCleanedData = [];
+        this.initChart();
       }
       this.laoding = false;
     },

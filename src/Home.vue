@@ -7,6 +7,7 @@
       <StatusContainer :key="chartCleanedData" v-if="view == 'chart'"></StatusContainer>
       <MapContainer v-show="view == 'map'"></MapContainer>
       <PartnerContainer v-if="view == 'chart'"></PartnerContainer>
+      <CsoContainer v-if="view == 'cso'"></CsoContainer>
     </div>
   </template>
 </template>
@@ -20,6 +21,7 @@ import FiltersContainer from './components/FiltersContainer.vue';
 import StatusContainer from './components/StatusContainer.vue';
 import MapContainer from './components/MapContainer.vue';
 import PartnerContainer from './components/PartnerContainer.vue';
+import CsoContainer from "./components/CsoContainer.vue";
 import Loader from "./components/Loader.vue";
 const store = useMainStore();
 const ready = ref(false);

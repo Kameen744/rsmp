@@ -50,7 +50,12 @@ const changeView = async (v) => {
   if(view.value == 'map') {
     selectedPrograms.value[v] = ['NiCare'];
   } else {
-    selectedPrograms.value[v] = ['Routine Immunization'];
+    if(view.value=='cso') {
+      cso = 'only';
+    } else {
+      cso.value = 'non';
+    }
+    selectedPrograms.value[v] = [];
   }
   selectedPartners.value[v] = [];
   selectedSupports.value[v] = [];
@@ -59,6 +64,6 @@ const changeView = async (v) => {
 
 const {
   selectedState, selectedLga, selectedPrograms, 
-  selectedPartners, selectedSupports, mapData, view
+  selectedPartners, selectedSupports, mapData, view, cso
 } =  storeToRefs(store);
 </script>

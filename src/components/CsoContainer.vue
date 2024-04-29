@@ -1,5 +1,5 @@
 <template>
-  <div class="container max-w-[89%] mx-auto px-0 mt-3" ref="chartMainContainerRef">
+  <div class="container max-w-[89%] mx-auto px-0 mt-3" ref="chartMainContainerCSORef">
     <!-- <div class="bg-white p-4 mb-3" v-for="spt in chartDataKeys"> -->
       <!-- <h3 class="text-lg pb-3 font-bold">{{ spt }}</h3> -->
       <!-- :options="store.getChartJsOptions(mapData[view]['data'][spt]['lgas_supported'])" -->
