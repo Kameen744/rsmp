@@ -43,17 +43,17 @@ import { onMounted, ref} from 'vue';
 const store = useMainStore();
 
 const changeView = async (v) => {
+  view.value = v;
   store.closePopup();
   selectedState.value[v] = 'Niger';
   selectedLga.value[v] = ''
-  if(view == 'map') {
+  if(view.value == 'map') {
     selectedPrograms.value[v] = ['NiCare'];
   } else {
     selectedPrograms.value[v] = ['Routine Immunization'];
   }
   selectedPartners.value[v] = [];
   selectedSupports.value[v] = [];
-  view.value = v;
   await store.updateApp();
 }
 
