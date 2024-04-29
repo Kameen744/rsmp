@@ -143,9 +143,9 @@ export const useMainStore = defineStore('useMainStore', {
         let patIndx = labels.indexOf(d.partner);
         // dataSetData[labelIndex] = d.lgas_sp;
         let dtObj = t.getDataObjAndColor(d.support, d.status);
-        // dtObj['data'][patIndx] = 0;
+        dtObj['data'][patIndx] = 0;
         if(dataSets.length <= 0) {
-          dtObj['data'][patIndx] = [d.lgas_sp];
+          dtObj['data'][patIndx] = d.lgas_sp;
           dataSets.push(dtObj);
         } else {
           // dtObj['data'] = [d.lgas_sp];
@@ -159,7 +159,7 @@ export const useMainStore = defineStore('useMainStore', {
           }
         }
       });
-      
+      // console.log(dataSets);
       return {
         labels: labels,
         datasets: dataSets
