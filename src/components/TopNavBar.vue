@@ -42,19 +42,23 @@ import { onMounted, ref} from 'vue';
 
 const store = useMainStore();
 
-const changeView = (v) => {
-  view.value = v;
+const changeView = async (v) => {
   store.closePopup();
   selectedState.value[v] = 'Niger';
   selectedLga.value[v] = ''
-
-  selectedPrograms.value[v] = ['NiCare'];
-  selectedPartners.value[v] = [] 
+  if(view == 'map') {
+    selectedPrograms.value[v] = ['NiCare'];
+  } else {
+    selectedPrograms.value[v] = ['Routine Immunization'];
+  }
+  selectedPartners.value[v] = [];
   selectedSupports.value[v] = [];
+  view.value = v;
+  await store.updateApp();
 }
 
 const {
   selectedState, selectedLga, selectedPrograms, 
-  selectedPartners, selectedSupports, view
+  selectedPartners, selectedSupports, mapData, view
 } =  storeToRefs(store);
 </script>

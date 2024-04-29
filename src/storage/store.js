@@ -244,7 +244,7 @@ export const useMainStore = defineStore('useMainStore', {
       let partners_param = '&partner=';
       let programs_param = '&program_area=';
       let support_param = '&support_types=';
-      let status_param = '&'
+      let status_param = '&status='
       let pts = this.selectedPartners[this.view];
       let prgs = this.selectedPrograms[this.view];
       let spts = this.selectedSupports[this.view];
@@ -276,6 +276,7 @@ export const useMainStore = defineStore('useMainStore', {
       // url += `&start_date=${this.selectedStartDate}&end_date=${this.selectedEndDate}`
       
       await this.fetch(url).then(async (res) => {
+        this.mapData[this.view] = null;
         this.mapData[this.view] = res.data;
         this.laoding = false;
       }).catch((error) => {
@@ -305,9 +306,11 @@ export const useMainStore = defineStore('useMainStore', {
         await this.createMap();
         await this.createDataPoints();
       } else {
+        // this.selectedPrograms = null;
         this.chartDataKeys = Object.keys(
           this.mapData[this.view]['data']
         );
+        
         this.chartCleanedData = [];
       }
       this.laoding = false;
