@@ -126,7 +126,7 @@ export const useMainStore = defineStore('useMainStore', {
           let chartOption = t.getChartJsOptions(rawData.total_lgas);
           
           chartDiv.className = 'bg-white p-4 mb-3 overflow-x-scroll';
-          patnerChartDiv.className = 'flex h-full';
+          patnerChartDiv.className = 'relative flex h-full';
           chartTitle.className = 'text-lg pb-3 font-bold';
           chartTitle.innerText = progArea;
     
@@ -141,8 +141,19 @@ export const useMainStore = defineStore('useMainStore', {
             let chartCanvas = document.createElement('canvas');
             let patSpt = chartData[partner];
             let c = document.createElement('div');
-            chartCanvas.className = `flex-none flex-auto max-w-[300px] max-h-[250px]`;
-           
+            chartCanvas.className = `flex-none flex-auto max-h-[250px]`;
+            
+
+            if(patSpt.length >= 8) {
+              chartCanvas.style.maxWidth = '500px';
+            } else if(patSpt.length >= 4) {
+              chartCanvas.style.maxWidth = '300px';
+            } else if(patSpt.length >= 2) {
+              chartCanvas.style.maxWidth = '250px';
+            } else {
+              chartCanvas.style.maxWidth = '230px'
+            }
+
             c.style.backgroundColor = patSpt[0].bg;
             c.style.margin = '10px';
             
@@ -165,9 +176,11 @@ export const useMainStore = defineStore('useMainStore', {
               });
             }
             
-            new Chart(chartCanvas, ctDatSet);
+            let ct = new Chart(chartCanvas, ctDatSet);
             // t.chartMainContainerRef.appendChild(chartCanvas);
             // c.appendChild(chartCanvas);
+            // chart.canvas.parentNode.style.height = '128px';
+            // chart.canvas.parentNode.style.width = '128px';
             patnerChartDiv.appendChild(chartCanvas);
             // console.log(ctObj);
             // console.log(patSpt);
