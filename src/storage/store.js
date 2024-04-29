@@ -123,35 +123,33 @@ export const useMainStore = defineStore('useMainStore', {
           let chartTitle = document.createElement('h3');
           
           let patnerChartDiv = document.createElement('div');
-          let chartOption = t.getChartJsOptions(30);
+          let chartOption = t.getChartJsOptions(rawData.total_lgas);
           
           chartDiv.className = 'bg-white p-4 mb-3 overflow-x-scroll';
           patnerChartDiv.className = 'flex h-full';
           chartTitle.className = 'text-lg pb-3 font-bold';
           chartTitle.innerText = progArea;
-          
     
           chartDiv.appendChild(chartTitle);
           
           partners.forEach((partner) => {
+            let pat_full_name = this.getValFromData(this.partners, 'short_name', partner);
+            if(pat_full_name) {
+              pat_full_name = pat_full_name.partner;
+            } 
+            
             let chartCanvas = document.createElement('canvas');
             let patSpt = chartData[partner];
             let c = document.createElement('div');
             chartCanvas.className = `flex-none flex-auto max-w-[300px] max-h-[250px]`;
            
-            // c.className = `min-w-[${patSpt.length * 50}px]`
-            // c.style.width = `${patSpt.length * 5}px]`
             c.style.backgroundColor = patSpt[0].bg;
             c.style.margin = '10px';
-          
-            // c.innerHTML = partner + ` ${patSpt[0].bg}`
-            // chartCanvas.style.width = '100%';
-            // chartCanvas.style.height = '100%';
             
             let ctDatSet = {
               type: 'bar',
               data: {
-                labels: [partner],
+                labels: [pat_full_name],
                 datasets: []
               },
               options: chartOption
@@ -202,6 +200,7 @@ export const useMainStore = defineStore('useMainStore', {
             'support': spt,
             'lgas_sp': supportData.lgas_supported,
             'status': supportData.status,
+            'pat_full': supportData.partner_full_name,
             'bg': bg.bg
           });
         }
@@ -307,7 +306,13 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     async fetchPartners() {
-      await this.fetch('partners').then(async (res) => {
+      let url = "map_view_partners";
+      if(this.view == 'cso') {
+        url = 'cso_partner';
+      } else if(this.view == 'chart') {
+        url = 'partners'
+      }
+      await this.fetch(url).then(async (res) => {
         this.partners = res.data.partners;
         this.laoding = false;
       });
