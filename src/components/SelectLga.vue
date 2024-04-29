@@ -3,7 +3,7 @@
     <div class="dropdown dropdown-bottom" @click="toggleDroped" @mouseleave="dropped=false">
       <div tabindex="0" role="button" class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec">
         <div class="inline-flex max-w-28 overflow-hidden">
-          {{selectedLga? selectedLga: 'LGA'}} 
+          {{selectedLga[view] ? selectedLga[view]: 'LGA'}} 
         </div>
         <b class="ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900">
           <svg v-if="dropped" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mt-1 ml-1 w-6 h-6">
@@ -40,10 +40,12 @@ const toggleDroped = () => {
   dropped.value = !dropped.value;
 }
 const SelectLga = (lga) => {
-  lga ? selectedLga.value = lga.lga : selectedLga.value = lga;
+  lga ? selectedLga.value[view.value] = lga.lga 
+  : selectedLga.value[view.value] = lga;
+
   store.updateApp();
 }
 const {
-  selectedLga, lgas
+  selectedLga, view, lgas
 } =  storeToRefs(store);
 </script>

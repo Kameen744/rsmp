@@ -10,13 +10,21 @@
       <div class="flex-none gap-2">
         <ul class="menu menu-horizontal px-1">
           <li class="mr-[2rem]">
-            <a href="#" class="text-white text-xl font-extrabold rounded-none">Map View</a>
+            <a href="" @click.prevent="changeView('map')" 
+                class="text-white text-xl font-extrabold rounded-none" :class="view=='map'?'active':''">
+              Map View
+            </a>
           </li>
           <li class="mr-[2rem]">
-            <a href="#" class="text-white text-xl rounded-none">Partner Dashboard</a>
+            <a href="" @click.prevent="changeView('chart')" 
+                class="text-white text-xl rounded-none" :class="view=='chart'?'active':''">
+              Partner Dashboard
+            </a> 
           </li>
           <li class="mr-[5rem]">
-            <a href="#" class=" text-white text-xl rounded-none">CSO Dashboard</a>
+            <a href="#" @click.prevent="changeView('cso')"
+                class=" text-white text-xl rounded-none">
+              CSO Dashboard</a>
           </li>
           <li>
             <button class="btn btn-md bg-white text-lg rounded-none">Logout</button>
@@ -28,7 +36,25 @@
 </template>
 
 <script setup>
-  import {ref, onMounted} from 'vue'
-  
-  const value = ref(null)
+import { useMainStore } from "./../storage/store";
+import { storeToRefs } from 'pinia';
+import { onMounted, ref} from 'vue';
+
+const store = useMainStore();
+
+const changeView = (v) => {
+  view.value = v;
+  store.closePopup();
+  selectedState.value[v] = 'Niger';
+  selectedLga.value[v] = ''
+
+  selectedPrograms.value[v] = ['NiCare'];
+  selectedPartners.value[v] = [] 
+  selectedSupports.value[v] = [];
+}
+
+const {
+  selectedState, selectedLga, selectedPrograms, 
+  selectedPartners, selectedSupports, view
+} =  storeToRefs(store);
 </script>

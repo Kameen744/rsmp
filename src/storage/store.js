@@ -1,12 +1,12 @@
 import { defineStore } from "pinia";
-import { ref, computed } from 'vue'
-// import Chart from 'chart.js/auto'
+import Chart from 'chart.js/auto'
 import axios from "axios";
-import { data } from "autoprefixer";
-// import { Modal } from 'bootstrap';
+
 
 export const useMainStore = defineStore('useMainStore', {
   state: () => ({
+    laoding: false,
+    view: 'map',
     map: null,
     mapFit: 8,
     states: null,
@@ -16,7 +16,11 @@ export const useMainStore = defineStore('useMainStore', {
     programAreas: null,
     supportTypes: null,
     cso: 'all',
-    mapData: null,
+    mapData: {},
+    chartData:null,
+    chartMainContainerRef: null,
+    chartDataKeys: null,
+    chartCleanedData: [],
     mapGeoData: Object,
     baseUrl: 'https://resourcemapping.sydani.org/api/method/resourcemapping.data',
     apiMethod: '',
@@ -31,16 +35,14 @@ export const useMainStore = defineStore('useMainStore', {
     lgaMapMarker: null,
     mapInfoProps: null,
     mapLegend: L.control({ position: 'bottomright' }),
-    selectedState: 'Niger',
-    selectedLga: null,
     selectedMarker: null,
     selectedLgaMarker: null,
-    selectedPartners: [
-    ],
-    selectedPrograms: [
-      'NiCare'
-    ],
-    selectedSupports: [],
+    selectedState: {},
+    selectedLga: {},
+    selectedPartners: {},
+    selectedPrograms: {},
+    selectedSupports: {},
+    selectedStatus: {},
     selectedStartDate: '2020-01-01',
     selectedEndDate: '2030-12-31'
   }),
@@ -94,33 +96,81 @@ export const useMainStore = defineStore('useMainStore', {
         '#C2740B', '#4A8186', '#A43E37', '#002B2E', '#8F3A37'];
     },
 
-    createChartData(data) {
-      this.barChartLabels = [];
-      this.barChartVals = [];
-      for (let k in data) {
-        this.barChartLabels.push(this.formatDate(k));
-        this.barChartVals.push(data[k]);
-      }
-    },
-
-    setChartJsTitle(og_name) {
-      this.barChartTitle = `
-      ${this.cElement.dh_short_name} in ${og_name} 
-      ${this.barChartLabels[0].substr(0, 3)} -
-       ${this.barChartLabels[this.barChartLabels.length - 1].substr(0, 3)} 
-       ${this.barChartLabels[0].substr(3)}
-       `;
-
-      if (this.cView == 'lga') {
-        this.topFiveBarChartTitle = `Top Five ${this.cElement.dh_short_name} In ${og_name} By LGAs`
-      } else if (this.cView == 'facility') {
-        this.topFiveBarChartTitle = `Top Five ${this.cElement.dh_short_name} In ${og_name} By Facility`
-      }
-
-    },
-
-    getChartJsOptions() {
+    getDataObjAndColor(supportType, status) {
+      let sptObj = this.getValFromData(
+      this.supportTypes, 'name', supportType);
       return {
+        label: supportType,
+        type: 'bar',
+        backgroundColor: sptObj.bg,
+        borderColor: '#C2554F',
+        data: []
+      }
+    },
+
+    createChartData(data) {
+      var t = this
+      const labels = Object.keys(data.partners);
+      const dataSets = []
+      const dataSetData = []
+      const supportTypes = {}
+
+      for(let a = 0; a < labels.length; a++) {
+        let pdt = labels[a];
+        let spTypes = Object.keys(data.partners[pdt]);
+        
+        for(let b = 0; b < spTypes.length; b++) {
+          const spt = spTypes[b];
+          const supportData = data.partners[pdt][spt]
+          t.chartCleanedData.push({
+            'partner': pdt,
+            'support': spt,
+            'lgas_sp': supportData.lgas_supported,
+            'status': supportData.status,
+          });
+        }
+      };
+      let checkIfLabelExists  = (label) => {
+        for(let j = 0; j < dataSets.length; j++) {
+          if(dataSets[j]['label'] == label) {
+            return j;
+          } else {
+            return false;
+          }
+        }
+      }
+      t.chartCleanedData.forEach((d) => {
+        let patIndx = labels.indexOf(d.partner);
+        // dataSetData[labelIndex] = d.lgas_sp;
+        let dtObj = t.getDataObjAndColor(d.support, d.status);
+        // dtObj['data'][patIndx] = 0;
+        if(dataSets.length <= 0) {
+          dtObj['data'][patIndx] = [d.lgas_sp];
+          dataSets.push(dtObj);
+        } else {
+          // dtObj['data'] = [d.lgas_sp];
+          let exPatInd = checkIfLabelExists(d.support);
+
+          if(exPatInd) {
+            dataSets[exPatInd]['data'][patIndx] = d.lgas_sp;
+          } else {
+            dtObj['data'][patIndx] = d.lgas_sp;
+            dataSets.push(dtObj);
+          }
+        }
+      });
+      
+      return {
+        labels: labels,
+        datasets: dataSets
+      }
+    },
+
+    getChartJsOptions(max) {
+     
+      // console.log(max);
+      return {
+        responsive: true,
         plugins: {
           legend: {
             display: false,
@@ -128,133 +178,106 @@ export const useMainStore = defineStore('useMainStore', {
         },
         scales: {
           y: {
-            beginAtZero: true
+            beginAtZero: true,
+            suggestedMax: 30,
+          },
+          x: {
+            categoryPercentage: 0.7 // Adjust as needed (default: 0.8)
           }
         },
-        barThickness: 30
+        // barThickness: 20
       }
-    },
-    updateChartsData() {
-      this.chartsDataUpdated = !this.chartsDataUpdated;
-    },
-    async createChartJs() {
-      if (this.chartJs) {
-        await this.chartJs.destroy();
-      }
-      this.chartJs = new Chart(this.chartJsContainer, {
-        // type: type,
-        data: {
-          labels: this.barChartLabels,
-          datasets: [{
-            // label: this.barChartTitle,
-            type: 'bar',
-            backgroundColor: '#004346',
-            borderColor: '#C2554F',
-            data: this.barChartVals,
-          },
-          ]
-        },
-        options: this.getChartJsOptions()
-      });
-      this.createTopFiveChart();
-    },
-
-    getTopFiveField(row) {
-      if (this.cView == 'lga') {
-        return row.properties.LGA
-      } else if (this.cView == 'facility') {
-        const facilityWithoutEk = row.facility.replace('ek', '');
-        const words = facilityWithoutEk.split(' ');
-        const fc = words.slice(-2).map(word => word.charAt(0).toUpperCase()).join('');
-        return `${words[1]} ${fc}`
-      }
-    },
-
-    
-    makeUrl() {
-      let url = '';
-      // let elements = this.selectedIndicators.join(',')
-      // console.log(elements)
-      let elements = this.cElement.dh_id;
-      if (this.cView == 'state') {
-        url = `statesData?indicatorId=${this.cElement.dh_id}${this.dateFilter()}`;
-      } else if (this.cView == 'lga') {
-        // this.cElement.dh_id
-        url = `lgasData?stateId=${this.cState}&indicatorId=${elements}${this.dateFilter()}`
-      } else if (this.cView == 'facility') {
-        url = `facilitiesData?lgaId=${this.cLga}&indicatorId=${this.cElement.dh_id}${this.dateFilter()}`
-      }
-      return url;
     },
 
     fetch(url) {
+      this.laoding = true;
       return axios.get(`${this.baseUrl}.${url}`);
     },
 
     async fetchStates() {
       await this.fetch('states').then(async (res) => {
-        this.states = res.data.states
+        this.states = res.data.states;
+        this.laoding = false;
       });
     },
 
     async fetchLgas() {
-      let url = `lgas?state=${this.selectedState}`
+      let url = `lgas?state=${this.selectedState[this.view]}`
       await this.fetch(url).then(async (res) => {
-        this.lgas = res.data.lgas
+        this.lgas = res.data.lgas;
+        this.laoding = false;
       });
     },
 
     async fetchFacilities() {
-      let url = `dh_facilities?state=${this.selectedState}`
+      let st = this.selectedState[this.view];
+      let url = `dh_facilities?state=${st}`
       await this.fetch(url).then(async (res) => {
-        this.facilities = res.data.facilities
+        this.facilities = res.data.facilities;
+        this.laoding = false;
       });
     },
 
     async fetchPartners() {
       await this.fetch('partners').then(async (res) => {
-        this.partners = res.data.partners
+        this.partners = res.data.partners;
+        this.laoding = false;
       });
     },
 
     async fetchPrograms() {
       await this.fetch('programs').then(async (res) => {
-        this.programAreas = res.data.programs
+        this.programAreas = res.data.programs;
+        this.laoding = false;
       });
     },
 
     async fetchSupportTypes() {
       await this.fetch('support_types').then(async (res) => {
-        this.supportTypes = res.data.support_types
+        this.supportTypes = res.data.support_types;
+        this.laoding = false;
       });
     },
 
     async fetchMapData() {
-      let url = `support_duration?state=${this.selectedState}&lga=${this.selectedLga}`
+      let url = `support_duration?`
       let partners_param = '&partner=';
       let programs_param = '&program_area=';
       let support_param = '&support_types=';
+      let status_param = '&'
+      let pts = this.selectedPartners[this.view];
+      let prgs = this.selectedPrograms[this.view];
+      let spts = this.selectedSupports[this.view];
+      let stts = this.selectedStatus[this.view];
 
-      this.selectedPartners.forEach((part) => {
+      pts.forEach((part) => {
         partners_param += `${part},`
       });
 
-      this.selectedPrograms.forEach((part) => {
+      prgs.forEach((part) => {
         programs_param += `${part},`
       });
 
-      this.selectedSupports.forEach((sp) => {
+      spts.forEach((sp) => {
         support_param += `${sp},`
       });
 
+      let st = this.selectedState[this.view];
+      let lg = this.selectedLga[this.view]
+      if(this.view == 'chart') {
+        url = `support_coverage?`
+      }
+      url += `state=${st}&lga=${lg}`
       url += programs_param
       url += partners_param
       url += support_param
       url += `&cso=${this.cso}`
-      url += `&start_date=${this.selectedStartDate}&end_date=${this.selectedEndDate}`
+      // date filter
+      // url += `&start_date=${this.selectedStartDate}&end_date=${this.selectedEndDate}`
       
       await this.fetch(url).then(async (res) => {
-        this.mapData = res.data
+        this.mapData[this.view] = res.data;
+        this.laoding = false;
       }).catch((error) => {
         console.log(error);
       });
@@ -268,19 +291,26 @@ export const useMainStore = defineStore('useMainStore', {
       await this.fetchSupportTypes();
       await this.fetchMapData();
       await this.fetchFacilities();
+      this.laoding = false;
     },
 
     async updateApp() {
       await this.fetchMapData();
-      // use again only if state changes
-      // await this.fetchFacilities();
-      await this.loadGeoData();
-      await this.mapMarkers.clearLayers();
-      await this.markerGeoJson.clearLayers();
-      await this.geoJson.clearLayers();
-      await this.geoJson.addData(this.mapGeoData);
-      await this.createMap();
-      await this.createDataPoints();
+      if(this.view == 'map') {
+        await this.loadGeoData();
+        await this.mapMarkers.clearLayers();
+        await this.markerGeoJson.clearLayers();
+        await this.geoJson.clearLayers();
+        await this.geoJson.addData(this.mapGeoData);
+        await this.createMap();
+        await this.createDataPoints();
+      } else {
+        this.chartDataKeys = Object.keys(
+          this.mapData[this.view]['data']
+        );
+        this.chartCleanedData = [];
+      }
+      this.laoding = false;
     },
 
     dateFilter() {
@@ -374,15 +404,17 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     fitBounds(geo) {
-      this.map.setView(geo.getBounds().getCenter(), this.mapFit);
+      // this.map.setView(geo.getBounds().getCenter(), this.mapFit);
+      this.map.fitBounds(geo.getBounds());
     },
 
     async zoomToMapFeature(e) {
       let dataSet = e.target.feature.properties;
+      let mpd = this.mapData[this.view];
       this.selectedMarker = null;
       
       if(this.selectedState) {
-        dataSet['supports'] = this.mapData.data[dataSet.state][dataSet.LGA];
+        dataSet['supports'] = mpd.data[dataSet.state][dataSet.LGA];
         this.selectedLgaMarker = dataSet;
       }
       
@@ -492,14 +524,16 @@ export const useMainStore = defineStore('useMainStore', {
 
     async createDataPoints() {
       var that = this;
+      let mpd = this.mapData[this.view].data;
       var layerGeoJson = {
         'type': 'FeatureCollection',
         'features': [
 
         ]
       }
-      for (const state in this.mapData.data) {
-        let stateObj = this.mapData.data[state];
+
+      for (const state in mpd) {
+        let stateObj = mpd[state];
         // let stateInfo = await this.getValFromData(
         //   this.states, 'state', state
         // );
@@ -509,18 +543,7 @@ export const useMainStore = defineStore('useMainStore', {
           for(const lga in stateObj) {
             let lgaObj = stateObj[lga];
             let lgaFacilities = that.facilities.filter(facility => facility.lga === lga);
-            
-            // let lgaInfo = await this.getValFromData(
-            //   this.lgas, 'lga', lga
-            // );
-            
-            // let lgPoints = this.generatePoints(lgaInfo.geometry, lgaObj.length);
-            // let lgaGeometry = JSON.parse(lgaInfo.geometry);
-            // let polygon = L.polygon(lgaGeometry.coordinates, {color: 'blue'});
-            // console.log(lgPoints);
-            // const randomPoint = random.choice(lgaInfo.geometry.coordinates[0]);
-            // const randomIndex = Math.floor(Math.random() * arrayOfArrays.length);
-          
+  
             lgaObj.forEach(async (row) => {
         
               let bg = await that.getValFromData(that.supportTypes, 'name', row.type_of_support).bg;
@@ -548,7 +571,7 @@ export const useMainStore = defineStore('useMainStore', {
                 </b>
                 `
               }
-              // console.log(mhtml)
+             
               layerGeoJson.features.push({
                 'type': 'Feature',
                 'properties': {
@@ -613,7 +636,7 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     async loadGeoData() {
-      if(this.selectedState) {
+      if(this.selectedState[this.view]) {
         this.mapFit = 8;
         this.loadMapGeometry(this.lgas);
       }
@@ -653,7 +676,9 @@ export const useMainStore = defineStore('useMainStore', {
     createMap() {
       if (this.map == null) {
        
-        this.map = L.map(this.mapContainerRef);
+        this.map = L.map(this.mapContainerRef, {
+          zoomSnap: 0.1
+        });
         // this.map.zoomControl.remove();
 
         // this.map = L.map(this.mapContainerRef, {
@@ -794,7 +819,6 @@ export const useMainStore = defineStore('useMainStore', {
       // });
       
       this.fitBounds(this.geoJson);
-     
       this.map.setMaxBounds(this.geoJson.getBounds());
     }
 

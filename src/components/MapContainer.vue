@@ -1,10 +1,9 @@
 <template>
-  <div class="" >
-    <div ref="mapContainerRef" class=" min-h-[77vh] flex justify-between">
+  <div v-show="view == 'map'">
+    <div ref="mapContainerRef" class="min-h-[77vh] max-h-[77vh] overflow-hidden">
     </div>
-    
+    <MarkerPopup v-if="selectedLgaMarker || selectedMarker"></MarkerPopup>
   </div>
-  <MarkerPopup v-if="selectedLgaMarker || selectedMarker"></MarkerPopup>
 </template>
 
 <script setup>
@@ -15,14 +14,10 @@ import MarkerPopup from './MarkerPopup.vue'
 
 const store = useMainStore();
 const {
-  mapContainerRef, mapData, states, lgas,
-  partners, programAreas, supportTypes,
-  selectedLgaMarker, selectedMarker
+  mapContainerRef, selectedLgaMarker, selectedMarker, view
 } =  storeToRefs(store);
 
 onMounted(async () => {
-  // await store.fetchMapData();
-  // console.log(mapData.value);
   await store.launchAapp();
   await store.loadGeoData();
   store.createMap();

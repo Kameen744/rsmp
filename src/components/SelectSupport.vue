@@ -3,10 +3,10 @@
     <div class="dropdown dropdown-bottom">
       <div tabindex="0" role="button" class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec min-w-36">
         <div class="inline-flex max-w-28 overflow-hidden">
-          <div class="text-nowrap" v-if="selectedSupports.length <= 0">
+          <div class="text-nowrap" v-if="selectedSupports[view].length <= 0">
             Support Type
           </div>
-          <div v-else class="text-nowrap" v-for="support in selectedSupports.slice(-2)">
+          <div v-else class="text-nowrap" v-for="support in selectedSupports[view].slice(-2)">
             {{ support }}
           </div>
         </div>
@@ -21,7 +21,7 @@
           <a href="" @click.prevent="SelectSupport(support)" class="hover:rounded-none text-lg inline-flex justify-between">
             <span>{{ support.name }}</span>
             <b class="w-8 h-8 rounded-full pr-1 bg-blue-200 text-center text-xs text-blue-900">
-              <svg v-if="selectedSupports.includes(support.name)" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mt-1 ml-1 w-6 h-6">
+              <svg v-if="selectedSupports[view].includes(support.name)" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mt-1 ml-1 w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
               </svg>
               <svg v-else xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mt-1 ml-1 w-6 h-6">
@@ -41,16 +41,18 @@ import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 const store = useMainStore();
 const SelectSupport = (support) => {
-  if(!selectedSupports.value.includes(support.name)) {
-    selectedSupports.value.push(support.name);
+  let sspt = selectedSupports.value[view.value];
+
+  if(!sspt.includes(support.name)) {
+    selectedSupports.value[view.value].push(support.name);
   } else {
-    selectedSupports.value = selectedSupports.value.filter(item => item !== support.name);
+    selectedSupports.value[view.value] = sspt.filter(item => item !== support.name);
   }
   
   store.updateApp();
 }
 
 const {
-  selectedSupports, supportTypes
+  selectedSupports, view, supportTypes
 } =  storeToRefs(store);
 </script>
