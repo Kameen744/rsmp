@@ -502,16 +502,11 @@ export const useMainStore = defineStore('useMainStore', {
       // layer.openPopup();
       // layer.bindTooltip()
       var tlt = tooltip().setContent(`
-        <div class="bg-blue-600 text-white m-0 p-1">
+        <div class="bg-blue-600 text-white text-lg font-bold m-0 p-1">
         ${e.target.feature.properties.LGA}
         </div>
       `);
-      layer.bindTooltip(tlt, {
-        direction: 'right',
-        permanent: false,
-        sticky: true,
-        offset: [10, 0],
-      }).openTooltip();
+      layer.bindTooltip(tlt).openTooltip();
       layer.setStyle({
         weight: 1,
         color: '#98A94A',
