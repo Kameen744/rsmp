@@ -429,10 +429,10 @@ export const useMainStore = defineStore('useMainStore', {
     async updateApp() {
       await this.fetchMapData();
       if(this.view == 'map') {
-        await this.loadGeoData();
         await this.mapMarkers.clearLayers();
         await this.markerGeoJson.clearLayers();
         await this.geoJson.clearLayers();
+        await this.loadGeoData();
         await this.geoJson.addData(this.mapGeoData);
         await this.createMap();
         await this.createDataPoints();
@@ -680,7 +680,7 @@ export const useMainStore = defineStore('useMainStore', {
     async createDataPoints() {
       var that = this;
       let mpd = this.mapData[this.view].data;
-      var layerGeoJson = {
+      let layerGeoJson = {
         'type': 'FeatureCollection',
         'features': [
 
