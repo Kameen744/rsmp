@@ -1,7 +1,7 @@
 <template>
   <div class="bg-white">
     <div class="container max-w-[89%] mx-auto px-0">
-      <ul class="menu menu-horizontal flex p-0 py-2 justify-between">
+      <ul class="menu menu-horizontal flex p-0 py-2 justify-center">
         <SelectState></SelectState>
         <SelectLga></SelectLga>
         <SelectProgram></SelectProgram>

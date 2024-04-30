@@ -113,6 +113,7 @@ export const useMainStore = defineStore('useMainStore', {
       var t = this;
       var mainCont = document.createElement('div');
       t.chartMainContainerRef.innerHTML = '';
+      
       for(let i=0; i<=t.chartDataKeys.length; i++) {
         let progArea = t.chartDataKeys[i];
         if (progArea) {
@@ -125,7 +126,7 @@ export const useMainStore = defineStore('useMainStore', {
           let patnerChartDiv = document.createElement('div');
           let chartOption = t.getChartJsOptions(rawData.total_lgas);
           
-          chartDiv.className = 'bg-white p-4 mb-3 overflow-x-scroll';
+          chartDiv.className = 'bg-white p-4 mb-3 overflow-x-hidden';
           patnerChartDiv.className = 'relative flex h-full';
           chartTitle.className = 'text-lg pb-3 font-bold';
           chartTitle.innerText = progArea;
@@ -140,8 +141,7 @@ export const useMainStore = defineStore('useMainStore', {
             
             let chartCanvas = document.createElement('canvas');
             let patSpt = chartData[partner];
-            let c = document.createElement('div');
-            chartCanvas.className = `flex-none flex-auto max-h-[250px]`;
+            chartCanvas.className = `max-h-[250px] mr-1`;
             
 
             if(patSpt.length >= 8) {
@@ -154,9 +154,6 @@ export const useMainStore = defineStore('useMainStore', {
               chartCanvas.style.maxWidth = '230px'
             }
 
-            c.style.backgroundColor = patSpt[0].bg;
-            c.style.margin = '10px';
-            
             let ctDatSet = {
               type: 'bar',
               data: {
@@ -415,8 +412,9 @@ export const useMainStore = defineStore('useMainStore', {
         // this.selectedPrograms = null;
         this.chartDataKeys = Object.keys(
           this.mapData[this.view]['data']
-        );
-        
+        )
+        this.chartDataKeys = this.chartDataKeys.sort();
+        console.log(this.chartDataKeys);
         this.chartCleanedData = [];
         this.initChart();
       }
