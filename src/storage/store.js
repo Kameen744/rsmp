@@ -502,7 +502,7 @@ export const useMainStore = defineStore('useMainStore', {
       // layer.openPopup();
       // layer.bindTooltip()
       var tlt = tooltip().setContent(`
-        <div class="bg-blue-600 text-white text-lg font-bold m-0 p-1">
+        <div class="bg-blue-600 text-white text-lg font-bold m-0 p-0 px-2">
         ${e.target.feature.properties.LGA}
         </div>
       `);
