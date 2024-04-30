@@ -32,6 +32,7 @@ onMounted(async () => {
     z-index: 10000;
     background: red;
   }
+  
   .facilities-marker div {
     position: absolute;
     top: 40%;

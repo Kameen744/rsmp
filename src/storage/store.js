@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import Chart from 'chart.js/auto'
 import axios from "axios";
+import { marker, tooltip } from "leaflet";
 Chart.defaults.datasets.bar.maxBarThickness = 25;
 
 export const useMainStore = defineStore('useMainStore', {
@@ -33,6 +34,7 @@ export const useMainStore = defineStore('useMainStore', {
     mapPointerHTML: '',
     mapInfo: L.control(),
     mapMarkers: null,
+    layerNamePopup: null,
     lgaMapMarker: null,
     mapInfoProps: null,
     mapLegend: L.control({ position: 'bottomright' }),
@@ -497,6 +499,19 @@ export const useMainStore = defineStore('useMainStore', {
 
     highlightMapFeature(e) {
       var layer = e.target;
+      // layer.openPopup();
+      // layer.bindTooltip()
+      var tlt = tooltip().setContent(`
+        <div class="bg-blue-600 text-white m-0 p-1">
+        ${e.target.feature.properties.LGA}
+        </div>
+      `);
+      layer.bindTooltip(tlt, {
+        direction: 'right',
+        permanent: false,
+        sticky: true,
+        offset: [10, 0],
+      }).openTooltip();
       layer.setStyle({
         weight: 1,
         color: '#98A94A',
@@ -526,7 +541,7 @@ export const useMainStore = defineStore('useMainStore', {
         this.selectedLgaMarker = dataSet;
       }
       
-      this.map.flyToBounds(e.target, { duration: 0.2 } );
+      this.map.flyToBounds(e.target, { duration: 0.2 } , 24);
     },
 
     mapInfoOnUpdate(props) {
@@ -623,11 +638,13 @@ export const useMainStore = defineStore('useMainStore', {
     closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
+      this.map.flyToBounds(this.geoJson, { duration: 0.2 });
     },
 
     markerEvent(e) {
       this.selectedLgaMarker = null;
       this.selectedMarker = e.target.feature.properties;
+      console.log(this.selectedMarker);
     },
 
     async createDataPoints() {
@@ -703,11 +720,6 @@ export const useMainStore = defineStore('useMainStore', {
                 this.markerGeoJson.clearLayers();
               }
 
-              // let mapMarkerIcon = L.divIcon({
-              //   html: that.mapPointerHTML,
-              //   popupAnchor: [0, 200]
-              // });
-              
               that.markerGeoJson = L.geoJSON(layerGeoJson, {
                 pointToLayer: function(feature, latlng) {
                   return L.marker(latlng, {
@@ -756,6 +768,13 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     onEachMapFeature(feature, layer) {
+      // var popupContent = `<div class="p-1 bg-info text-white">
+      //   ${feature.properties.LGA}
+      // </div>`;
+      // var layerNamePopup = L.popup().setContent(popupContent);
+      // layer.bindPopup(layerNamePopup);
+      
+
       layer.on({
         mouseover: this.highlightMapFeature,
         mouseout: this.resetMapHighlight,
