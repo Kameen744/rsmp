@@ -18,9 +18,10 @@ export const useMainStore = defineStore('useMainStore', {
     supportTypes: null,
     cso: 'all',
     mapData: {},
-    chartData:null,
+    chartData: null,
     chartMainContainerRef: null,
     chartMainContainerCSORef: null,
+    statusContRef: null,
     chartDataKeys: null,
     chartCleanedData: [],
     mapGeoData: Object,
@@ -94,6 +95,15 @@ export const useMainStore = defineStore('useMainStore', {
       });
     },
 
+    scrollDataContainer(e) {
+      let scrollPos = e.target.scrollTop;
+      if(scrollPos >= 10.3) {
+        this.statusContRef.classList.add('sticky', 'top-[-20px]', 'z-[99]');
+      } else {
+        this.statusContRef.classList.remove('sticky', 'top-0', 'z-[99]');
+      }
+    },
+
     getChartColors() {
       return ['#004346', '#7FDBFF', '#8F3985', '#FF6F61', '#4D8169', '#C64F4A', '#A15751',
         '#C2740B', '#4A8186', '#A43E37', '#002B2E', '#8F3A37'];
@@ -128,7 +138,7 @@ export const useMainStore = defineStore('useMainStore', {
           let patnerChartDiv = document.createElement('div');
           let chartOption = t.getChartJsOptions(rawData.total_lgas);
           
-          chartDiv.className = 'bg-white p-4 mb-3 overflow-x-hidden';
+          chartDiv.className = 'bg-white p-4 mb-3 overflow-x-scroll';
           patnerChartDiv.className = 'relative flex h-full';
           chartTitle.className = 'text-lg pb-3 font-bold';
           chartTitle.innerText = progArea;
@@ -137,29 +147,33 @@ export const useMainStore = defineStore('useMainStore', {
           
           partners.forEach((partner) => {
             let pat_full_name = this.getValFromData(this.partners, 'short_name', partner);
+            
             if(pat_full_name) {
               pat_full_name = pat_full_name.partner;
-            } 
+            } else {
+              pat_full_name = partner
+            }
             
             let chartCanvas = document.createElement('canvas');
             let patSpt = chartData[partner];
             chartCanvas.className = `max-h-[250px] mr-1`;
             
-
-            if(patSpt.length >= 8) {
-              chartCanvas.style.maxWidth = '500px';
-            } else if(patSpt.length >= 4) {
-              chartCanvas.style.maxWidth = '300px';
-            } else if(patSpt.length >= 2) {
-              chartCanvas.style.maxWidth = '250px';
-            } else {
-              chartCanvas.style.maxWidth = '230px'
-            }
+            let pxls = (patSpt.length * 40) + 100;
+            chartCanvas.style.maxWidth = `${pxls}px`;
+            // if(patSpt.length >= 8) {
+            //   chartCanvas.style.maxWidth = '500px';
+            // } else if(patSpt.length >= 4) {
+            //   chartCanvas.style.maxWidth = '300px';
+            // } else if(patSpt.length >= 2) {
+            //   chartCanvas.style.maxWidth = '250px';
+            // } else {
+            //   chartCanvas.style.maxWidth = '230px'
+            // }
 
             let ctDatSet = {
               type: 'bar',
               data: {
-                labels: [pat_full_name],
+                labels: [partner],
                 datasets: []
               },
               options: chartOption
@@ -167,12 +181,14 @@ export const useMainStore = defineStore('useMainStore', {
 
             for(let k=0; k < patSpt.length; k++) {
               let spDt = patSpt[k];
-              ctDatSet.data.datasets.push({
+              if(spDt.lgas_sp >0) {
+                ctDatSet.data.datasets.push({
                 label: spDt.support,
                 backgroundColor: spDt.bg,
                 data: [spDt.lgas_sp],
                 borderWidth: 1
               });
+              }
             }
             
             let ct = new Chart(chartCanvas, ctDatSet);
@@ -206,6 +222,7 @@ export const useMainStore = defineStore('useMainStore', {
         for(let b = 0; b < spTypes.length; b++) {
           const spt = spTypes[b];
           const supportData = data.partners[pdt][spt]
+          console.log(supportData);
           const bg = t.getValFromData(t.supportTypes, 'name', spt);
           t.chartCleanedData.push({
             'partner': pdt,
@@ -270,6 +287,7 @@ export const useMainStore = defineStore('useMainStore', {
       // console.log(max);
       return {
         responsive: true,
+        maintainAspectRatio: true,
         plugins: {
           legend: {
             display: false,
@@ -373,9 +391,17 @@ export const useMainStore = defineStore('useMainStore', {
         url = `support_coverage?`
       }
       url += `state=${st}&lga=${lg}`
-      url += programs_param
-      url += partners_param
-      url += support_param
+
+      if(this.selectedPrograms) {
+        url += programs_param
+      }
+      if(this.selectedPartners) {
+        url += partners_param
+      }
+      if(this.selectedSupports) {
+        url += support_param
+      }
+      
       url += `&cso=${this.cso}`
       // date filter
       // url += `&start_date=${this.selectedStartDate}&end_date=${this.selectedEndDate}`
@@ -416,7 +442,7 @@ export const useMainStore = defineStore('useMainStore', {
           this.mapData[this.view]['data']
         )
         this.chartDataKeys = this.chartDataKeys.sort();
-        console.log(this.chartDataKeys);
+        // console.log(this.chartDataKeys);
         this.chartCleanedData = [];
         this.initChart();
       }
@@ -648,7 +674,7 @@ export const useMainStore = defineStore('useMainStore', {
     markerEvent(e) {
       this.selectedLgaMarker = null;
       this.selectedMarker = e.target.feature.properties;
-      console.log(this.selectedMarker);
+      // console.log(this.selectedMarker);
     },
 
     async createDataPoints() {

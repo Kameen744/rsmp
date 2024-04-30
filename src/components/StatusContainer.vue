@@ -1,5 +1,5 @@
 <template>
-  <div class="container max-w-[89%] mx-auto px-0">
+  <div class="container max-w-[89%] mx-auto px-0" ref="statusContRef">
     <div class="flex justify-between pr-0 bg-white p-4 py-0 pt-2">
         <div class="">
           <h3 class="font-bold">SUPPORT TYPES</h3>
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import {ref} from 'vue';
+import {onMounted, onUnmounted, ref} from 'vue';
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 const store = useMainStore();
@@ -49,6 +49,6 @@ const getSpBg = (spName) => {
 
 const {
   chartCleanedData, supportTypes, selectedState, selectedLga, selectedPrograms, 
-  selectedPartners, selectedSupports, view
+  selectedPartners, selectedSupports, view, statusContRef
 } =  storeToRefs(store);
 </script>

@@ -3,8 +3,12 @@
     <Loader></Loader>
     <TopNavBar></TopNavBar>
     <FiltersContainer></FiltersContainer>  
-    <div class="bg-slate-100 max-h-[77vh] overflow-hidden overflow-y-auto" :class="view=='map'?'':'pt-2'">
-      <StatusContainer :key="chartCleanedData" v-if="view == 'chart'"></StatusContainer>
+    <div 
+      class="bg-slate-100 max-h-[77vh] overflow-hidden overflow-y-auto" 
+      :class="view=='map'?'':'pt-2'" v-on:scroll="store.scrollDataContainer">
+      <StatusContainer 
+        :key="chartCleanedData" 
+          v-if="view == 'chart'"></StatusContainer>
       <MapContainer v-show="view == 'map'"></MapContainer>
       <PartnerContainer v-if="view == 'chart'"></PartnerContainer>
       <CsoContainer v-if="view == 'cso'"></CsoContainer>
@@ -37,7 +41,7 @@ onMounted(() => {
 })
 
 const {
-  selectedState, selectedPrograms, selectedLga, 
+  selectedState, selectedPrograms, selectedLga, statusContRef,  
   selectedPartners, selectedSupports, chartCleanedData, view
 } =  storeToRefs(store);
 </script>

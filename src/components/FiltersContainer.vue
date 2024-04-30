@@ -5,7 +5,7 @@
         <SelectState></SelectState>
         <SelectLga></SelectLga>
         <SelectProgram></SelectProgram>
-        <!-- <SelectPartner></SelectPartner> -->
+        <SelectPartner v-if="view == 'map'"></SelectPartner>
         <SelectSupport></SelectSupport>
         <!-- <selectStartDate></selectStartDate>
         <selectEndDate></selectEndDate> -->
@@ -22,4 +22,8 @@ import SelectPartner from './SelectPartner.vue';
 import SelectSupport from './SelectSupport.vue';
 import selectStartDate from './selectStartDate.vue';
 import selectEndDate from './selectEndDate.vue';
+import { useMainStore } from "./../storage/store";
+import { storeToRefs } from 'pinia';
+const store = useMainStore();
+const {view} =  storeToRefs(store);
 </script>
