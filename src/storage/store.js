@@ -535,6 +535,15 @@ export const useMainStore = defineStore('useMainStore', {
         dataSet['supports'] = mpd.data[dataSet.state][dataSet.LGA];
         this.selectedLgaMarker = dataSet;
       }
+      let layer = e.target;
+      layer.setStyle({
+        weight: 1,
+        color: 'red',
+        backgroundColor: 'red',
+        dashArray: '',
+        fillOpacity: 0.8
+      });
+      // this.geoJson.resetStyle(e.target);
       
       this.map.flyToBounds(e.target, { duration: 0.2 } , 24);
     },

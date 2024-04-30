@@ -21,11 +21,11 @@
               Partner Dashboard
             </a> 
           </li>
-          <li class="mr-[5rem]">
+          <!-- <li class="mr-[5rem]">
             <a href="#" @click.prevent="changeView('cso')"
                 class=" text-white text-xl rounded-none">
               CSO Dashboard</a>
-          </li>
+          </li> -->
           <li>
             <button class="btn btn-md bg-white text-lg rounded-none">Logout</button>
           </li>
