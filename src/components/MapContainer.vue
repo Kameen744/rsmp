@@ -1,10 +1,10 @@
 <template>
   <div v-show="view == 'map'">
     <div ref="mapContainerRef" class="min-h-[77vh] max-h-[77vh] overflow-hidden">
-      <div class="absolute top-[10px] left-[100px] z-[991] font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer" @click="showSupportTypes=!showSupportTypes">
+      <div v-if="currentSupports[view]" class="absolute top-[10px] left-[100px] z-[991] font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer" @click="showSupportTypes=!showSupportTypes">
         <h6 class="p-0 m-0">KEY</h6>
       </div>
-      <div v-if="currentSupports[view] && showSupportTypes" class="bg-white font-bold text-[15px] z-[991] shadow flex justify-start absolute top-[60px] left-[100px] max-w-[70vw] overflow-auto">
+      <div v-if="showSupportTypes" class="bg-white font-bold text-[15px] z-[991] shadow flex justify-start absolute top-[60px] left-[100px] max-w-[70vw] overflow-auto">
           <h4 
             class="p-3 py-2 text-cyan-50 m-2" 
             v-for="(val, key) in currentSupports[view]" :style="`background: ${val.bg};`">
