@@ -16,6 +16,7 @@ export const useMainStore = defineStore('useMainStore', {
     partners: null,
     programAreas: null,
     supportTypes: null,
+    currentSupports: {},
     cso: 'all',
     mapData: {},
     chartData: null,
@@ -125,7 +126,7 @@ export const useMainStore = defineStore('useMainStore', {
       var t = this;
       var mainCont = document.createElement('div');
       t.chartMainContainerRef.innerHTML = '';
-      
+      this.currentSupports[this.view] = {}
       for(let i=0; i<=t.chartDataKeys.length; i++) {
         let progArea = t.chartDataKeys[i];
         if (progArea) {
@@ -181,6 +182,10 @@ export const useMainStore = defineStore('useMainStore', {
 
             for(let k=0; k < patSpt.length; k++) {
               let spDt = patSpt[k];
+              this.currentSupports[this.view][spDt.support] = {
+                'bg': spDt.bg,
+                'txt': spDt.txt
+              }
               if(spDt.lgas_sp >0) {
                 ctDatSet.data.datasets.push({
                 label: spDt.support,
@@ -222,15 +227,14 @@ export const useMainStore = defineStore('useMainStore', {
         for(let b = 0; b < spTypes.length; b++) {
           const spt = spTypes[b];
           const supportData = data.partners[pdt][spt]
-          console.log(supportData);
-          const bg = t.getValFromData(t.supportTypes, 'name', spt);
           t.chartCleanedData.push({
             'partner': pdt,
             'support': spt,
             'lgas_sp': supportData.lgas_supported,
             'status': supportData.status,
             'pat_full': supportData.partner_full_name,
-            'bg': bg.bg
+            'bg': supportData.type_of_support_bg,
+            'txt': supportData.type_of_support_txt
           });
         }
       };
@@ -689,6 +693,7 @@ export const useMainStore = defineStore('useMainStore', {
     async createDataPoints() {
       var that = this;
       let mpd = this.mapData[this.view].data;
+      this.currentSupports[this.view] = {}
       let layerGeoJson = {
         'type': 'FeatureCollection',
         'features': [
@@ -701,22 +706,25 @@ export const useMainStore = defineStore('useMainStore', {
         // let stateInfo = await this.getValFromData(
         //   this.states, 'state', state
         // );
-        
-      
         if(this.selectedState) {
           for(const lga in stateObj) {
             let lgaObj = stateObj[lga];
             let lgaFacilities = that.facilities.filter(facility => facility.lga === lga);
   
             lgaObj.forEach(async (row) => {
-        
-              let bg = await that.getValFromData(that.supportTypes, 'name', row.type_of_support).bg;
+              let bg = row.type_of_support_bg;
+              // let bg = await that.getValFromData(that.supportTypes, 'name', row.type_of_support).bg;
               
               let len = lgaFacilities.length;
               let randomIndex = Math.floor(Math.random() * len);
               let randFacility = lgaFacilities[randomIndex];
               let randGeo = JSON.parse(randFacility.geometry);
               let mhtml = ''
+
+              this.currentSupports[this.view][row.type_of_support] = {
+                'bg': bg,
+                'txt': row.type_of_support_txt
+              }
             
               if(row.status == 'Ongoing') {
                 mhtml = `
