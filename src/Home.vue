@@ -36,12 +36,13 @@ onMounted(() => {
   selectedPrograms.value[view.value] = ['NiCare'];
   selectedPartners.value[view.value] = []; 
   selectedSupports.value[view.value] = [];
-
+  selectedStatus.value[view.value] = [];
   ready.value = true;
 })
 
 const {
   selectedState, selectedPrograms, selectedLga, statusContRef,  
-  selectedPartners, selectedSupports, chartCleanedData, view
+  selectedPartners, selectedSupports, chartCleanedData, view,
+  selectedStatus
 } =  storeToRefs(store);
 </script>

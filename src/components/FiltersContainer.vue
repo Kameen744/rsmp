@@ -7,6 +7,7 @@
         <SelectProgram></SelectProgram>
         <SelectPartner v-if="view == 'map'"></SelectPartner>
         <SelectSupport></SelectSupport>
+        <SelectStatus></SelectStatus>
         <!-- <selectStartDate></selectStartDate>
         <selectEndDate></selectEndDate> -->
       </ul>
@@ -20,8 +21,10 @@ import SelectLga from './SelectLga.vue';
 import SelectProgram from './SelectProgram.vue';
 import SelectPartner from './SelectPartner.vue';
 import SelectSupport from './SelectSupport.vue';
-import selectStartDate from './selectStartDate.vue';
-import selectEndDate from './selectEndDate.vue';
+import SelectStatus from './SelectStatus.vue';
+// import selectStartDate from './selectStartDate.vue';
+// import selectEndDate from './selectEndDate.vue';
+
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 const store = useMainStore();

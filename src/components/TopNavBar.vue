@@ -59,11 +59,12 @@ const changeView = async (v) => {
   }
   selectedPartners.value[v] = [];
   selectedSupports.value[v] = [];
+  selectedStatus.value[v] = [];
   await store.updateApp();
 }
 
 const {
-  selectedState, selectedLga, selectedPrograms, 
+  selectedState, selectedLga, selectedPrograms, selectedStatus,
   selectedPartners, selectedSupports, mapData, view, cso
 } =  storeToRefs(store);
 </script>

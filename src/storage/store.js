@@ -24,7 +24,7 @@ export const useMainStore = defineStore('useMainStore', {
     statusContRef: null,
     chartDataKeys: null,
     chartCleanedData: [],
-    mapGeoData: Object,
+    mapGeoData: {},
     baseUrl: 'https://resourcemapping.sydani.org/api/method/resourcemapping.data',
     apiMethod: '',
     mapContainerRef: null,
@@ -367,7 +367,7 @@ export const useMainStore = defineStore('useMainStore', {
       let partners_param = '&partner=';
       let programs_param = '&program_area=';
       let support_param = '&support_types=';
-      let status_param = '&status='
+      let status_param = '&support_status='
       let pts = this.selectedPartners[this.view];
       let prgs = this.selectedPrograms[this.view];
       let spts = this.selectedSupports[this.view];
@@ -385,23 +385,31 @@ export const useMainStore = defineStore('useMainStore', {
         support_param += `${sp},`
       });
 
+      stts.forEach((st) => {
+        status_param += `${st},`
+      })
+
       let st = this.selectedState[this.view];
       let lg = this.selectedLga[this.view]
+
       if(this.view == 'chart') {
         url = `support_coverage?`
       }
       url += `state=${st}&lga=${lg}`
 
-      if(this.selectedPrograms) {
+      if(this.selectedPrograms[this.view]) {
         url += programs_param
       }
-      if(this.selectedPartners) {
+      if(this.selectedPartners[this.view]) {
         url += partners_param
       }
-      if(this.selectedSupports) {
+      if(this.selectedSupports[this.view]) {
         url += support_param
       }
-      
+      if(this.selectedStatus[this.view]) {
+        url += status_param
+      }
+
       url += `&cso=${this.cso}`
       // date filter
       // url += `&start_date=${this.selectedStartDate}&end_date=${this.selectedEndDate}`
@@ -433,7 +441,7 @@ export const useMainStore = defineStore('useMainStore', {
         await this.markerGeoJson.clearLayers();
         await this.geoJson.clearLayers();
         await this.loadGeoData();
-        await this.geoJson.addData(this.mapGeoData);
+        // await this.geoJson.addData(this.mapGeoData);
         await this.createMap();
         await this.createDataPoints();
       } else {
@@ -606,6 +614,7 @@ export const useMainStore = defineStore('useMainStore', {
     },  
 
     async loadMapGeometry(data) {
+
       this.mapGeoData = {
         'type': 'FeatureCollection',
         'features': []
@@ -712,11 +721,11 @@ export const useMainStore = defineStore('useMainStore', {
               if(row.status == 'Ongoing') {
                 mhtml = `
                 <div class="shadow-sm w-3 h-3 rounded-full" style="background: ${bg};"></div>
-                `
+                `;
               } else if(row.status == 'Completed') {
                 mhtml = `
                 <div class="shadow-sm w-3 h-3" style="background: ${bg};"></div>
-                `
+                `;
               } else {
                 mhtml = `
                 <b class="w-0 h-0 
@@ -724,7 +733,7 @@ export const useMainStore = defineStore('useMainStore', {
                   border-b-[15px] border-b-[${bg}]
                   border-r-[10px] border-r-transparent">
                 </b>
-                `
+                `;
               }
              
               layerGeoJson.features.push({
@@ -811,28 +820,27 @@ export const useMainStore = defineStore('useMainStore', {
         click: this.zoomToMapFeature
       });
 
-      // let bounds = layer.getBounds().getCenter();
+      let bounds = layer.getBounds().getCenter();
 
-      // let icon = L.divIcon({
-      //   iconSize: null,
-      //   iconAnchor: [25, 10],
-      //   html: `<small class="ml-1 mr-1" id="layer-name-label">
-      //     ${feature.properties.State ? feature.properties.State : feature.properties.LGA}
-      //   </small>`
-      // });
+      let icon = L.divIcon({
+        iconSize: null,
+        iconAnchor: [25, 10],
+        html: `<small class="ml-1 mr-1" id="layer-name-label">
+          ${feature.properties.State ? feature.properties.State : feature.properties.LGA}
+        </small>`
+      });
 
-      // L.marker(bounds, { icon: icon }).addTo(this.mapMarkers);
+      L.marker(bounds, { icon: icon }).addTo(this.mapMarkers);
 
       // L.marker(pos).addTo(this.map);
 
-      // this.mapMarker = L.marker(bounds, { icon: icon })
+      this.mapMarker = L.marker(bounds, { icon: icon })
       // console.log(this.mapMarker);
-      // // this.mapMarker.addTo(this.map);
+      this.mapMarker.addTo(this.map);
     },
 
     createMap() {
       if (this.map == null) {
-       
         this.map = L.map(this.mapContainerRef, {
           zoomSnap: 0.1
         });
@@ -928,8 +936,15 @@ export const useMainStore = defineStore('useMainStore', {
         // L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         // }).addTo(this.map);
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-          attribution: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
+
+        // L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        //   attribution: 'Tiles © <a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer">ArcGIS</a>',
+        // }).addTo(this.map);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20
         }).addTo(this.map);
 
         // L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
