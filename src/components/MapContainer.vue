@@ -81,10 +81,6 @@ const {
     left: 100px;
   }
   .facilities-marker div {
-    /* position: absolute;
-    top: 40%;
-    left: 5%; */
-    /* border-radius: 50%; */
     width: 8px;
     height: 8px;
   }
