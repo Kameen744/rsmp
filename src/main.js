@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import router from './router';
-// import * as L from './assets/leaflet/leaflet'
+// import * as L from './assets/leaflet/leaflet.js';
 import * as L from 'leaflet';
 // import * as bing from 'leaflet-bing-layer';
 

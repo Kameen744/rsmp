@@ -1,16 +1,40 @@
 <template>
-  <div v-show="view == 'map'">
+  <div v-show="view == 'map'" class="relative">
     <div ref="mapContainerRef" class="min-h-[77vh] max-h-[77vh] overflow-hidden">
-      <div v-if="currentSupports[view]" class="absolute top-[10px] left-[100px] z-[991] font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer" @click="showSupportTypes=!showSupportTypes">
-        <h6 class="p-0 m-0">KEY</h6>
-      </div>
-      <div v-if="showSupportTypes" class="bg-white font-bold text-[15px] z-[991] shadow flex justify-start absolute top-[60px] left-[100px] max-w-[70vw] overflow-auto">
-          <h4 
-            class="p-3 py-2 text-cyan-50 m-2" 
-            v-for="(val, key) in currentSupports[view]" :style="`background: ${val.bg};`">
-            {{ key }}
-        </h4>
-      </div>
+    </div>
+    <div class=" absolute top-[10px] left-[80px] z-[991] bg-transparent">
+        <div v-if="currentSupports[view]" class="font-bold text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]" @click="showSupportTypes=!showSupportTypes">
+          <h6 class="p-0 m-0">KEY</h6>
+        </div>
+        <div v-if="showSupportTypes" class="bg-white font-bold text-[15px] shadow max-w-[75vw] overflow-auto mt-2">
+          <h3 class="p-2">TYPE OF SUPPORT</h3>
+          <div class="flex justify-start pr-4 mr-4">
+            <div 
+                class="p-3 py-2 text-cyan-50 m-2" 
+                v-for="(val, key) in currentSupports[view]" :style="`background: ${val.bg};`">
+                {{ key }}
+            </div>
+          </div>
+          <hr>
+          <h3 class="p-2">STATUS</h3>
+          <div class="flex justify-start p-2">
+            <div class="mr-3">
+              <div class="mx-auto shadow-sm w-8 h-8 rounded-full bg-blue-600"></div>
+              <b>Ongoing</b>
+            </div>
+            <div class="mr-3">
+              <div class="mx-auto shadow-sm w-8 h-8 bg-blue-600"></div>
+              <b>Completed</b>
+            </div>
+            <div class="mr-3">
+              <div class="mx-auto w-0 h-0 border-l-[20px] border-l-transparent
+                border-b-[32px] border-b-blue-600
+                border-r-[20px] border-r-transparent">
+              </div>
+              <b>Pending</b>
+            </div>
+          </div>
+        </div>
     </div>
     <MarkerPopup v-if="selectedLgaMarker || selectedMarker"></MarkerPopup>
   </div>
@@ -20,7 +44,7 @@
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
-import MarkerPopup from './MarkerPopup.vue'
+import MarkerPopup from './MarkerPopup.vue';
 const store = useMainStore();
 const showSupportTypes = ref(false)
 // const listOfSuports = ref(new Set());
@@ -37,15 +61,13 @@ const showSupportTypes = ref(false)
 // }
 
 onMounted(async () => {
+  mapContainerRefMain.value = mapContainerRef.value;
   await store.launchAapp();
-  await store.loadGeoData();
-  store.createMap();
-  store.createDataPoints();
 });
 
 const {
   mapContainerRef, selectedLgaMarker, currentSupports, mapData,
-  selectedMarker, view
+  selectedMarker, mapContainerRefMain, view
 } =  storeToRefs(store);
 </script>
 
@@ -60,10 +82,12 @@ const {
     padding: 1px;
     padding-top: 0px;
     color: rgb(251, 251, 251);
-    font-size: 9px;
+    background: balck;
+    font-size: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    z-index: 9;
     /* background-color: rgb(12, 47, 47); */
   }
   .info {

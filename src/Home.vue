@@ -1,6 +1,5 @@
 <template>
   <template v-if="ready">
-    <Loader></Loader>
     <TopNavBar></TopNavBar>
     <FiltersContainer></FiltersContainer>  
     <div 
@@ -26,7 +25,7 @@ import StatusContainer from './components/StatusContainer.vue';
 import MapContainer from './components/MapContainer.vue';
 import PartnerContainer from './components/PartnerContainer.vue';
 import CsoContainer from "./components/CsoContainer.vue";
-import Loader from "./components/Loader.vue";
+
 const store = useMainStore();
 const ready = ref(false);
 

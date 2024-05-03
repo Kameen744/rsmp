@@ -17,6 +17,11 @@
         </b>
       </div>
       <ul tabindex="0" class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec" v-if="dropped">
+        <li class="rounded-none border-b-2 border-blue-50" v-if="view == 'chart'">
+          <a href="" @click.prevent="SelectProgram(null)" class="hover:rounded-none text-lg">
+            Program Area
+          </a>
+        </li>
         <li class="rounded-none border-b-2 border-blue-50" v-for="program in programAreas">
           <a href="" @click.prevent="SelectProgram(program)" class="hover:rounded-none text-lg">
             {{ program.service }}
@@ -37,7 +42,12 @@ const toggleDroped = () => {
   dropped.value = !dropped.value;
 }
 const SelectProgram = (program) => {
-  selectedPrograms.value[view.value] = [program.service];
+  if(program) {
+    selectedPrograms.value[view.value] = [program.service];
+  } else {
+    selectedPrograms.value[view.value] = [];
+  }
+  
   store.updateApp();
 }
 const {

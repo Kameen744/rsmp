@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import Chart from 'chart.js/auto'
 import axios from "axios";
 import { marker, tooltip } from "leaflet";
+import { toRaw } from "vue";
 Chart.defaults.datasets.bar.maxBarThickness = 25;
 
 export const useMainStore = defineStore('useMainStore', {
@@ -28,7 +29,10 @@ export const useMainStore = defineStore('useMainStore', {
     mapGeoData: {},
     baseUrl: 'https://resourcemapping.sydani.org/api/method/resourcemapping.data',
     apiMethod: '',
+    mapContainerRefMain: null,
     mapContainerRef: null,
+    // mapKeyRef: null,
+    // mapKeyContentRef: null,
     geoJson: null,
     markerGeoJson: null,
     today: new Date(),
@@ -315,28 +319,64 @@ export const useMainStore = defineStore('useMainStore', {
       return axios.get(`${this.baseUrl}.${url}`);
     },
 
+    setLoc(key, val) {
+      val = JSON.stringify(val)
+      localStorage.setItem(key, val);
+    },
+
+    getLoc(key) {
+      let val = localStorage.getItem(key);
+      if(val) {
+        val = JSON.parse(val);
+      }
+      return val;
+    },
+
+    delLoc(key) {
+      localStorage.removeItem(key);
+    },
+    
     async fetchStates() {
-      await this.fetch('states').then(async (res) => {
-        this.states = res.data.states;
-        this.laoding = false;
-      });
+      let states = this.getLoc('states');
+      if(states) {
+        this.states = states;
+      } else {
+        await this.fetch('states').then(async (res) => {
+          this.states = res.data.states;
+          this.setLoc('states', this.states);
+          this.laoding = false;
+        });
+      }
     },
 
     async fetchLgas() {
       let url = `lgas?state=${this.selectedState[this.view]}`
-      await this.fetch(url).then(async (res) => {
-        this.lgas = res.data.lgas;
-        this.laoding = false;
-      });
+      let lgs = this.getLoc(url);
+      if(lgs) {
+        this.lgas = lgs;
+      } else {
+        await this.fetch(url).then(async (res) => {
+          this.lgas = res.data.lgas;
+          this.setLoc(url, this.lgas);
+          this.laoding = false;
+        });
+      }
     },
 
     async fetchFacilities() {
       let st = this.selectedState[this.view];
-      let url = `dh_facilities?state=${st}`
-      await this.fetch(url).then(async (res) => {
-        this.facilities = res.data.facilities;
-        this.laoding = false;
-      });
+      let localFcsName = `facilities${st}`;
+      let localFcs = this.getLoc(localFcsName);
+      if(localFcs) {
+        this.facilities = localFcs;
+      } else {
+        let url = `dh_facilities?state=${st}`
+        await this.fetch(url).then(async (res) => {
+          this.facilities = res.data.facilities;
+          this.setLoc(localFcsName, this.facilities);
+          this.laoding = false;
+        });
+      }
     },
 
     async fetchPartners() {
@@ -346,24 +386,31 @@ export const useMainStore = defineStore('useMainStore', {
       } else if(this.view == 'chart') {
         url = 'partners'
       }
-      await this.fetch(url).then(async (res) => {
-        this.partners = res.data.partners;
-        this.laoding = false;
-      });
+      
+      if(!this.partners) {
+        await this.fetch(url).then(async (res) => {
+          this.partners = res.data.partners;
+          this.laoding = false;
+        });
+      }
     },
 
     async fetchPrograms() {
-      await this.fetch('programs').then(async (res) => {
-        this.programAreas = res.data.programs;
-        this.laoding = false;
-      });
+      if(!this.programAreas) {
+        await this.fetch('programs').then(async (res) => {
+          this.programAreas = res.data.programs;
+          this.laoding = false;
+        });
+      }
     },
 
     async fetchSupportTypes() {
-      await this.fetch('support_types').then(async (res) => {
-        this.supportTypes = res.data.support_types;
-        this.laoding = false;
-      });
+      if(!this.supportTypes) {
+        await this.fetch('support_types').then(async (res) => {
+          this.supportTypes = res.data.support_types;
+          this.laoding = false;
+        });
+      }
     },
 
     async fetchMapData() {
@@ -376,7 +423,7 @@ export const useMainStore = defineStore('useMainStore', {
       let prgs = this.selectedPrograms[this.view];
       let spts = this.selectedSupports[this.view];
       let stts = this.selectedStatus[this.view];
-
+      
       pts.forEach((part) => {
         partners_param += `${part},`
       });
@@ -435,19 +482,26 @@ export const useMainStore = defineStore('useMainStore', {
       await this.fetchSupportTypes();
       await this.fetchMapData();
       await this.fetchFacilities();
+      await this.loadGeoData();
+      await this.createMap();
+      // await this.createDataPoints();
+     
+      // this.mapMarkers.addTo(this.map);
       this.laoding = false;
     },
 
     async updateApp() {
       await this.fetchMapData();
       if(this.view == 'map') {
-        await this.mapMarkers.clearLayers();
-        await this.markerGeoJson.clearLayers();
-        await this.geoJson.clearLayers();
+        // await this.mapMarkers.clearLayers();
+        // await this.markerGeoJson.clearLayers();
+        // await this.geoJson.clearLayers();
         await this.loadGeoData();
         // await this.geoJson.addData(this.mapGeoData);
+        this.map.remove();
+        this.mapContainerRef.innerHTML = '';
         await this.createMap();
-        await this.createDataPoints();
+        // await this.createDataPoints();
       } else {
         // this.selectedPrograms = null;
         this.chartDataKeys = Object.keys(
@@ -544,7 +598,8 @@ export const useMainStore = defineStore('useMainStore', {
         ${e.target.feature.properties.LGA}
         </div>
       `);
-      layer.bindTooltip(tlt).openTooltip();
+      layer.bindTooltip(tlt);
+      layer.openTooltip();
       layer.setStyle({
         weight: 1,
         color: '#98A94A',
@@ -639,44 +694,44 @@ export const useMainStore = defineStore('useMainStore', {
       });
     },
 
-    generatePoints(mapGeometry, numPoints) {
-      // Parse the GeoJSON polygon data
-      const polygon = JSON.parse(mapGeometry);
+    // generatePoints(mapGeometry, numPoints) {
+    //   // Parse the GeoJSON polygon data
+    //   const polygon = JSON.parse(mapGeometry);
     
-      // Function to generate a random point within a polygon
-      function getRandomPointInPolygon(polygon, retries) {
-        const coordinates = polygon.coordinates[0];
-        const minX = Math.min(...coordinates.map(point => point[0]));
-        const maxX = Math.max(...coordinates.map(point => point[0]));
-        const minY = Math.min(...coordinates.map(point => point[1]));
-        const maxY = Math.max(...coordinates.map(point => point[1]));
+    //   // Function to generate a random point within a polygon
+    //   function getRandomPointInPolygon(polygon, retries) {
+    //     const coordinates = polygon.coordinates[0];
+    //     const minX = Math.min(...coordinates.map(point => point[0]));
+    //     const maxX = Math.max(...coordinates.map(point => point[0]));
+    //     const minY = Math.min(...coordinates.map(point => point[1]));
+    //     const maxY = Math.max(...coordinates.map(point => point[1]));
     
-        // Generate random values within the polygon bounds
-        const randomX = Math.random() * (maxX - minX) + minX;
-        const randomY = Math.random() * (maxY - minY) + minY;
+    //     // Generate random values within the polygon bounds
+    //     const randomX = Math.random() * (maxX - minX) + minX;
+    //     const randomY = Math.random() * (maxY - minY) + minY;
     
-        // Check if the point is inside the polygon using the Ray Casting algorithm
-        // let inside = false;
-        // for (let i = 0, j = coordinates.length - 1; i < coordinates.length; j = i++) {
-        //   const xi = coordinates[i][0], yi = coordinates[i][1];
-        //   const xj = coordinates[j][0], yj = coordinates[j][1];
+    //     // Check if the point is inside the polygon using the Ray Casting algorithm
+    //     // let inside = false;
+    //     // for (let i = 0, j = coordinates.length - 1; i < coordinates.length; j = i++) {
+    //     //   const xi = coordinates[i][0], yi = coordinates[i][1];
+    //     //   const xj = coordinates[j][0], yj = coordinates[j][1];
     
-        //   const intersect = ((yi > randomY) != (yj > randomY)) &&
-        //     (randomX < (xj - xi) * (randomY - yi) / (yj - yi) + xi);
+    //     //   const intersect = ((yi > randomY) != (yj > randomY)) &&
+    //     //     (randomX < (xj - xi) * (randomY - yi) / (yj - yi) + xi);
     
-        //   if (intersect) inside = !inside;
-        // }
+    //     //   if (intersect) inside = !inside;
+    //     // }
         
-        return [randomX, randomY];
-      }
+    //     return [randomX, randomY];
+    //   }
     
-      const points = [];
-      for (let i = 0; i < numPoints; i++) {
-        points.push(getRandomPointInPolygon(polygon));
-      }
+    //   const points = [];
+    //   for (let i = 0; i < numPoints; i++) {
+    //     points.push(getRandomPointInPolygon(polygon));
+    //   }
     
-      return points;
-    },
+    //   return points;
+    // },
 
     closePopup() {
       this.selectedLgaMarker = null;
@@ -686,7 +741,7 @@ export const useMainStore = defineStore('useMainStore', {
 
     markerEvent(e) {
       this.selectedLgaMarker = null;
-      this.selectedMarker = e.target.feature.properties;
+      this.selectedMarker = e.target.options.icon.options.icData;
       // console.log(this.selectedMarker);
     },
 
@@ -697,7 +752,6 @@ export const useMainStore = defineStore('useMainStore', {
       let layerGeoJson = {
         'type': 'FeatureCollection',
         'features': [
-
         ]
       }
 
@@ -712,6 +766,7 @@ export const useMainStore = defineStore('useMainStore', {
             let lgaFacilities = that.facilities.filter(facility => facility.lga === lga);
   
             lgaObj.forEach(async (row) => {
+              // console.log(row);
               let bg = row.type_of_support_bg;
               // let bg = await that.getValFromData(that.supportTypes, 'name', row.type_of_support).bg;
               
@@ -767,22 +822,35 @@ export const useMainStore = defineStore('useMainStore', {
                 this.markerGeoJson.clearLayers();
               }
 
-              that.markerGeoJson = L.geoJSON(layerGeoJson, {
-                pointToLayer: function(feature, latlng) {
-                  return L.marker(latlng, {
-                    icon: L.divIcon({
-                      className: 'facilities-marker',
-                      html: feature.properties.html,
-                      popupAnchor: [0, 200]
-                    })
-                  }).on('click', that.markerEvent)
-                }
-              }).addTo(that.map);
+              // that.markerGeoJson = L.geoJSON(layerGeoJson, {
+              //   pointToLayer: function(feature, latlng) {
+              //     return L.marker(latlng, {
+              //       icon: L.divIcon({
+              //         className: 'facilities-marker',
+              //         html: feature.properties.html,
+              //         popupAnchor: [0, 200]
+              //       })
+              //     }).on('click', that.markerEvent);
+              //   }
+              // });
+              
+              // that.markerGeoJson.addTo(that.mapMarkers);
+
+              // that.mapMarkers
+              // that.mapMarkers.addTo(that.map);
+              // .addTo(that.map);
+
+              layerGeoJson.features.forEach(function(feature) {
+                var coordinates = feature.geometry.coordinates.reverse(); // Leaflet expects [lat, lng], GeoJSON provides [lng, lat]
+                var mkr = L.marker(coordinates);
+                that.mapMarkers.addLayer(mkr); // Add marker to the layer group
+              });
 
             });
           }
         }
         
+        // this.mapMarkers.addTo(this.map);
       }
 
       // for (let i = 0; i < numPoints; i++) {
@@ -814,14 +882,24 @@ export const useMainStore = defineStore('useMainStore', {
       this.mapInfo.update();
     },
 
-    onEachMapFeature(feature, layer) {
-      // var popupContent = `<div class="p-1 bg-info text-white">
-      //   ${feature.properties.LGA}
-      // </div>`;
-      // var layerNamePopup = L.popup().setContent(popupContent);
-      // layer.bindPopup(layerNamePopup);
-      
+    getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+      var R = 6371; // Radius of the earth in km
+      var dLat = this.deg2rad(lat2 - lat1);
+      var dLon = this.deg2rad(lon2 - lon1);
+      var a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      var d = R * c; // Distance in km
+      return d;
+    },
+    
+    deg2rad(deg) {
+      return deg * (Math.PI / 180);
+    },
 
+    onEachMapFeature(feature, layer) {
       layer.on({
         mouseover: this.highlightMapFeature,
         mouseout: this.resetMapHighlight,
@@ -829,29 +907,134 @@ export const useMainStore = defineStore('useMainStore', {
       });
 
       let bounds = layer.getBounds().getCenter();
-
+      // console.log(bounds);
       let icon = L.divIcon({
         iconSize: null,
         iconAnchor: [25, 10],
-        html: `<small class="ml-1 mr-1" id="layer-name-label">
+        html: `<small class="ml-1 mr-1 bg-[#D4D9B0]" id="layer-name-label">
           ${feature.properties.State ? feature.properties.State : feature.properties.LGA}
         </small>`
       });
 
-      L.marker(bounds, { icon: icon }).addTo(this.mapMarkers);
-
-      // L.marker(pos).addTo(this.map);
-
-      this.mapMarker = L.marker(bounds, { icon: icon })
-      // console.log(this.mapMarker);
+      // L.marker(bounds, { icon: icon }).addTo(this.mapMarkers);
+      // this.mapMarkers.addTo(this.map);
+      this.mapMarker = L.marker(bounds, { icon: icon });
       this.mapMarker.addTo(this.map);
+
+      if(this.selectedState[this.view]) {
+        let st = this.selectedState[this.view];
+        let lg = feature.properties.LGA;
+        let mpDt = this.mapData[this.view].data[st][lg];
+        if (mpDt) {
+          let lgaFclts = this.facilities.filter(fc => fc.lga === lg);
+          let fcLen = lgaFclts.length;
+          mpDt.forEach((d) => {
+            let randomIndex = Math.floor(Math.random() * fcLen);
+            let randFacility = lgaFclts[randomIndex];
+            let randGeo = JSON.parse(randFacility.geometry);
+            let cords = randGeo.coordinates.reverse();
+            let mhtml = ''
+            let bg = d.type_of_support_bg
+
+            this.currentSupports[this.view][d.type_of_support] = {
+              'bg': bg,
+              'txt': d.type_of_support_txt
+            }
+
+            if(d.status == 'Ongoing') {
+              mhtml = `
+              <div class="shadow-sm w-3 h-3 rounded-full" style="background: ${bg};"></div>
+              `;
+            } else if(d.status == 'Completed') {
+              mhtml = `
+              <div class="shadow-sm w-3 h-3" style="background: ${bg};"></div>
+              `;
+            } else {
+              mhtml = `
+              <b class="w-0 h-0 
+                border-l-[10px] border-l-transparent
+                border-b-[15px] border-b-[${bg}]
+                border-r-[10px] border-r-transparent">
+              </b>
+              `;
+            }
+           
+            let iconData = {
+              'lga': lg,
+              'type_of_support': d.type_of_support,
+              'partner': d.partner,
+              'status': d.status,
+              'start_date': d.start_date,
+              'end_date': d.end_date
+            }
+            
+            let icon = L.divIcon({
+              className: 'facilities-marker',
+              icData: iconData,
+              html: mhtml,
+              popupAnchor: [0, 200]
+            });
+
+            // L.geoJSON(layerGeoJson, {
+            //   pointToLayer: function(feature, latlng) {
+            //     return L.marker(latlng, {
+            //       icon: 
+            //     }).on('click', that.markerEvent);
+            //   }
+            // });
+            
+            L.marker(cords, {icon: icon}).addTo(this.map)
+              .on('click', this.markerEvent);
+
+            // var distance = this.getDistanceFromLatLonInKm(
+            //   cords[0], cords[1], bounds.lat, bounds.lng
+            // );
+          });
+        }
+      }
     },
 
-    createMap() {
-      if (this.map == null) {
-        this.map = L.map(this.mapContainerRef, {
+    async createMap() {
+      // if(this.map) {
+      //   this.mapContainerRef.removeChild(this.mapContainerRef.firstChild);
+
+      // } 
+        var mapContainerParent = this.mapContainerRef.parentNode;
+        var mapContainer = this.mapContainerRef;
+        // var keyContainer = document.createElement('div');
+        // var keyContainerInfo = document.createElement('div');
+        // var keyContainerSupports = document.createElement('div');
+        
+        // keyContainer.className = 'font-bold absolute top-[10px] z-[991] left-[100px] text-[15px] p-2 shadow bg-white rounded cursor-pointer max-w-[45px]';
+        // keyContainerInfo.className = 'bg-white font-bold text-[15px] shadow max-w-[70vw] overflow-auto mt-2'
+        
+        // keyContainer.innerHTML = '<h6 class="p-0 m-0">KEY</h6>';
+        // keyContainerInfo.innerHTML = '<h3 class="p-2">TYPE OF SUPPORT</h3>';
+
+        // keyContainer.onclick = () => {console.log('keyClicked')}
+
+        mapContainerParent.removeChild(this.mapContainerRef);
+
+        // mapContainerParent.insertBefore(this.mapContainerRefMain, mapContainerParent.firstChild);
+        // this.mapContainerRef = mapContainerParent.firstChild;
+        mapContainerParent.appendChild(mapContainer);
+
+      
+
+      // var newMapContainer = document.createElement('div');
+      // newMapContainer.className = 'min-h-[77vh] max-h-[77vh]'
+
+      // mapContainerParent.insertBefore(newMapContainer, this.mapContainerRefMain.firstChild);
+      
+
+      this.currentSupports[this.view] = {}
+      
+      // if (this.map == null) {
+        this.map = L.map(mapContainer, {
           zoomSnap: 0.1
         });
+
+        // mapContainer.appendChild(keyContainer);
         // this.map.zoomControl.remove();
 
         // this.map = L.map(this.mapContainerRef, {
@@ -979,20 +1162,19 @@ export const useMainStore = defineStore('useMainStore', {
         // this.mapLegend.addTo(this.map);
 
         this.mapMarkers = L.layerGroup();
-        this.mapMarkers.addTo(this.map);
-        
+        // console.log(this.mapGeoData);
         this.geoJson = L.geoJson(this.mapGeoData, {
           style: this.layerStyle,
           onEachFeature: this.onEachMapFeature
         }).addTo(this.map);
 
-      } else {
-        // this.mapMarker.remove();
-        // this.mapMarker.addTo(this.map);
-        this.mapMarkers.clearLayers();
-        this.geoJson.clearLayers();
-        this.geoJson.addData(this.mapGeoData);
-      }
+      // } else {
+      //   // this.mapMarker.remove();
+      //   // this.mapMarker.addTo(this.map);
+      //   this.mapMarkers.clearLayers();
+      //   this.geoJson.clearLayers();
+      //   this.geoJson.addData(this.mapGeoData);
+      // }
 
       // this.mapTlayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       //   attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -1001,6 +1183,5 @@ export const useMainStore = defineStore('useMainStore', {
       this.fitBounds(this.geoJson);
       this.map.setMaxBounds(this.geoJson.getBounds());
     }
-
   },
 });
