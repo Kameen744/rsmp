@@ -126,11 +126,21 @@ export const useMainStore = defineStore('useMainStore', {
       }
     },
 
+    findArrObj(array, key, value) {
+      for (var i = 0; i < array.length; i++) {
+          if (array[i][key] === value) {
+            return i; 
+          }
+      }
+      return -1;
+    },
+
     initChart() {
       var t = this;
       var mainCont = document.createElement('div');
       t.chartMainContainerRef.innerHTML = '';
       this.currentSupports[this.view] = {}
+
       for(let i=0; i<=t.chartDataKeys.length; i++) {
         let progArea = t.chartDataKeys[i];
         if (progArea) {
@@ -163,8 +173,7 @@ export const useMainStore = defineStore('useMainStore', {
             let patSpt = chartData[partner];
             chartCanvas.className = `max-h-[250px] mr-1`;
             
-            let pxls = (patSpt.length * 40) + 100;
-            chartCanvas.style.maxWidth = `${pxls}px`;
+            
             // if(patSpt.length >= 8) {
             //   chartCanvas.style.maxWidth = '500px';
             // } else if(patSpt.length >= 4) {
@@ -191,14 +200,23 @@ export const useMainStore = defineStore('useMainStore', {
                 'txt': spDt.txt
               }
               if(spDt.lgas_sp >0) {
-                ctDatSet.data.datasets.push({
-                label: spDt.support,
-                backgroundColor: spDt.bg,
-                data: [spDt.lgas_sp],
-                borderWidth: 1
-              });
+                let spIndx = t.findArrObj(ctDatSet.data.datasets, 'label', spDt.support);
+                if(spIndx >= 0) {
+                  ctDatSet.data.datasets[spIndx]['data'].push(spDt.lgas_sp);
+                } else {
+                  ctDatSet.data.datasets.push({
+                    label: spDt.support,
+                    backgroundColor: spDt.bg,
+                    data: [spDt.lgas_sp],
+                    borderWidth: 1
+                  });
+                }
               }
             }
+
+            let noOfBars = ctDatSet.data.datasets.length;
+            let pxls = (noOfBars * 40) + 100;
+            chartCanvas.style.maxWidth = `${pxls}px`;
             
             let ct = new Chart(chartCanvas, ctDatSet);
             // t.chartMainContainerRef.appendChild(chartCanvas);
