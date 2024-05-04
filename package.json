@@ -12,14 +12,16 @@
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vueform/multiselect": "^2.6.7",
     "axios": "^1.6.8",
-    "leaflet": "^1.9.4",
     "chart.js": "^4.0.0",
-    "vue-chartjs": "^5.0.0",
+    "leaflet": "^1.9.4",
     "mini-svg-data-uri": "^1.4.4",
+    "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
+    "vue-chartjs": "^5.0.0",
     "vue-router": "^4.3.2",
-    "vue-tailwind-datepicker": "^1.7.3"
+    "vue-tailwind-datepicker": "^1.7.3",
+    "vue3-progress": "^0.0.1-beta4"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.7",

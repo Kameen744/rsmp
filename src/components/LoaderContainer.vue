@@ -1,0 +1,43 @@
+<template>
+<div v-show="isLaoding" class="progress">
+</div>
+</template>
+
+<script setup>
+import { useMainStore } from "./../storage/store";
+import { storeToRefs } from 'pinia';
+const store = useMainStore();
+const {
+  isLaoding
+} =  storeToRefs(store);
+</script>
+
+<style scoped>
+.progress {
+   height: 4.5px;
+   width: 100%;
+   position: absolute;
+   top: 0px;
+   left: 0px;
+   background: linear-gradient(#1142F3 0 0),
+       linear-gradient(#1142F3 0 0),
+       #dbdcef;
+   background-size: 60% 100%;
+   background-repeat: no-repeat;
+   animation: progress-7x9cg2 1s infinite;
+}
+
+@keyframes progress-7x9cg2 {
+   0% {
+      background-position: -150% 0,-150% 0;
+   }
+
+   66% {
+      background-position: 250% 0,-150% 0;
+   }
+
+   100% {
+      background-position: 250% 0, 250% 0;
+   }
+}
+</style>

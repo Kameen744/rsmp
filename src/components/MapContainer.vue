@@ -45,6 +45,7 @@ import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 import { onMounted, ref } from 'vue';
 import MarkerPopup from './MarkerPopup.vue';
+
 const store = useMainStore();
 const showSupportTypes = ref(false)
 // const listOfSuports = ref(new Set());

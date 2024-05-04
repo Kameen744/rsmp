@@ -7,7 +7,7 @@ Chart.defaults.datasets.bar.maxBarThickness = 25;
 
 export const useMainStore = defineStore('useMainStore', {
   state: () => ({
-    laoding: false,
+    isLaoding: false,
     view: 'map',
     map: null,
     mapFit: 8,
@@ -146,7 +146,9 @@ export const useMainStore = defineStore('useMainStore', {
         if (progArea) {
           let rawData = t.mapData[t.view]['data'][progArea];
           let chartData = t.createChartData(rawData);
+         
           let partners = Object.keys(chartData);
+         
           let chartDiv = document.createElement('div');
           let chartTitle = document.createElement('h3');
           
@@ -333,7 +335,7 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     fetch(url) {
-      this.laoding = true;
+      this.isLaoding = true;
       return axios.get(`${this.baseUrl}.${url}`);
     },
 
@@ -362,7 +364,7 @@ export const useMainStore = defineStore('useMainStore', {
         await this.fetch('states').then(async (res) => {
           this.states = res.data.states;
           this.setLoc('states', this.states);
-          this.laoding = false;
+          this.isLaoding = false;
         });
       }
     },
@@ -376,7 +378,7 @@ export const useMainStore = defineStore('useMainStore', {
         await this.fetch(url).then(async (res) => {
           this.lgas = res.data.lgas;
           this.setLoc(url, this.lgas);
-          this.laoding = false;
+          this.isLaoding = false;
         });
       }
     },
@@ -392,7 +394,7 @@ export const useMainStore = defineStore('useMainStore', {
         await this.fetch(url).then(async (res) => {
           this.facilities = res.data.facilities;
           this.setLoc(localFcsName, this.facilities);
-          this.laoding = false;
+          this.isLaoding = false;
         });
       }
     },
@@ -408,7 +410,7 @@ export const useMainStore = defineStore('useMainStore', {
       if(!this.partners) {
         await this.fetch(url).then(async (res) => {
           this.partners = res.data.partners;
-          this.laoding = false;
+          this.isLaoding = false;
         });
       }
     },
@@ -417,7 +419,7 @@ export const useMainStore = defineStore('useMainStore', {
       if(!this.programAreas) {
         await this.fetch('programs').then(async (res) => {
           this.programAreas = res.data.programs;
-          this.laoding = false;
+          this.isLaoding = false;
         });
       }
     },
@@ -426,7 +428,7 @@ export const useMainStore = defineStore('useMainStore', {
       if(!this.supportTypes) {
         await this.fetch('support_types').then(async (res) => {
           this.supportTypes = res.data.support_types;
-          this.laoding = false;
+          this.isLaoding = false;
         });
       }
     },
@@ -486,7 +488,7 @@ export const useMainStore = defineStore('useMainStore', {
       await this.fetch(url).then(async (res) => {
         this.mapData[this.view] = null;
         this.mapData[this.view] = res.data;
-        this.laoding = false;
+        this.isLaoding = false;
       }).catch((error) => {
         console.log(error);
       });
@@ -505,7 +507,7 @@ export const useMainStore = defineStore('useMainStore', {
       // await this.createDataPoints();
      
       // this.mapMarkers.addTo(this.map);
-      this.laoding = false;
+      this.isLaoding = false;
     },
 
     async updateApp() {
@@ -530,7 +532,7 @@ export const useMainStore = defineStore('useMainStore', {
         this.chartCleanedData = [];
         this.initChart();
       }
-      this.laoding = false;
+      this.isLaoding = false;
     },
 
     dateFilter() {
