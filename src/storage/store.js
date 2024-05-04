@@ -217,7 +217,7 @@ export const useMainStore = defineStore('useMainStore', {
             }
 
             let noOfBars = ctDatSet.data.datasets.length;
-            let pxls = (noOfBars * 40) + 100;
+            let pxls = (noOfBars * 50) + 100;
             chartCanvas.style.maxWidth = `${pxls}px`;
             
             let ct = new Chart(chartCanvas, ctDatSet);
