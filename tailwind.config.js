@@ -24,6 +24,7 @@ export default {
         "vtd-primary": colors.sky,
         "sydani-blue": '#173863',
         "rsmp-sec": '#1142F3',
+        "black-rgba": 'rgba(0, 0, 0, 0.75)',
       },
       backgroundImage: (theme) => ({
         'multiselect-caret': `url("${svgToDataUri(

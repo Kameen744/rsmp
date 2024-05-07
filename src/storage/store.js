@@ -135,6 +135,74 @@ export const useMainStore = defineStore('useMainStore', {
       return -1;
     },
 
+    chartTooltip (context) {
+      const tooltipModel = context.tooltip;
+      let tooltipEl = document.getElementById('chartjs-tooltip');
+
+      // Create element on first render
+      if (!tooltipEl) {
+          tooltipEl = document.createElement('div');
+          tooltipEl.id = 'chartjs-tooltip';
+      }
+
+      if (tooltipModel.opacity === 0) {
+          tooltipEl.style.opacity = 0;
+          return;
+      }
+
+      let title = tooltipModel.title[0];
+      let longTitle = this.getValFromData(this.partners, 'short_name', title);
+      if(longTitle == null) {
+        
+        longTitle = this.getValFromData(this.partners, 'partner', title);
+        console.log(longTitle, ' from if after');
+        console.log(this.partners, title);
+      }
+      longTitle = longTitle.partner;
+
+      let val = tooltipModel.body[0].lines[0];
+      val = val.split(':');
+
+      tooltipEl.innerHTML = `
+        <div><b>Partner:</b> ${longTitle}</div>
+        <hr class="p-0 m-0">
+        <div><b>Support:</b> ${val[0]}</div>
+        <hr class="p-0 m-0">
+        <div><b>LGAs Supported:</b> ${val[1]}</div>
+      `;
+
+      document.body.appendChild(tooltipEl);
+
+      const position = context.chart.canvas.getBoundingClientRect();
+     
+      tooltipEl.className = 'z-[9999] p-2 bg-rsmp-sec text-white absolute top-[20px], left-[10px] opacity-100'
+      tooltipEl.style.opacity = 1;
+      tooltipEl.style.position = 'absolute';
+      // tooltipEl.style.top = '0px';
+      // tooltipEl.style.left = '0px';
+      tooltipEl.style.left = position.left + window.scrollX + tooltipModel.caretX + 'px';
+      tooltipEl.style.top = position.top + window.scrollY + tooltipModel.caretY + 'px';
+      // tooltipEl.style.font = bodyFont.string;
+      // tooltipEl.style.padding = tooltipModel.padding + 'px ' + tooltipModel.padding + 'px';
+      tooltipEl.style.pointerEvents = 'none';
+      
+      // Hide if no tooltip
+      // const tooltipModel = context.tooltip;
+      // if (tooltipModel.opacity === 0) {
+      //     tooltipEl.style.opacity = 0;
+      //     return;
+      // }
+
+       // Set caret Position
+      //  tooltipEl.classList.remove('above', 'below', 'no-transform');
+      //  if (tooltipModel.yAlign) {
+      //      tooltipEl.classList.add(tooltipModel.yAlign);
+      //  } else {
+      //      tooltipEl.classList.add('no-transform');
+      //  }
+
+    },
+
     initChart() {
       var t = this;
       var mainCont = document.createElement('div');
@@ -320,6 +388,10 @@ export const useMainStore = defineStore('useMainStore', {
           legend: {
             display: false,
           },
+          tooltip: {
+            enabled: false,
+            external: this.chartTooltip
+          }
         },
         scales: {
           y: {
