@@ -5,7 +5,7 @@
         <SelectState></SelectState>
         <SelectLga></SelectLga>
         <SelectProgram></SelectProgram>
-        <SelectPartner v-if="view == 'map'"></SelectPartner>
+        <SelectPartner></SelectPartner>
         <SelectSupport></SelectSupport>
         <SelectStatus></SelectStatus>
         <!-- <selectStartDate></selectStartDate>

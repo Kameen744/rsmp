@@ -100,6 +100,13 @@ export const useMainStore = defineStore('useMainStore', {
       });
     },
 
+    selected(data, val) {
+      if(data.includes(val)) {
+        return true;
+      }
+      return false;
+    },
+
     scrollDataContainer(e) {
       let scrollPos = e.target.scrollTop;
       if(scrollPos >= 10.3) {
@@ -175,7 +182,7 @@ export const useMainStore = defineStore('useMainStore', {
 
       const position = context.chart.canvas.getBoundingClientRect();
      
-      tooltipEl.className = 'z-[9999] p-2 bg-rsmp-sec text-white absolute top-[20px], left-[10px] opacity-100'
+      tooltipEl.className = 'z-[9999] shadow p-2 bg-rsmp-sec text-white absolute top-[20px], left-[10px] opacity-100'
       tooltipEl.style.opacity = 1;
       tooltipEl.style.position = 'absolute';
       // tooltipEl.style.top = '0px';
@@ -1016,7 +1023,12 @@ export const useMainStore = defineStore('useMainStore', {
       if(this.selectedState[this.view]) {
         let st = this.selectedState[this.view];
         let lg = feature.properties.LGA;
-        let mpDt = this.mapData[this.view].data[st][lg];
+        let mpDt = null;
+       
+        if(this.mapData[this.view].data[st]) {
+          mpDt = this.mapData[this.view].data[st][lg];
+        }
+    
         if (mpDt) {
           let lgaFclts = this.facilities.filter(fc => fc.lga === lg);
           let fcLen = lgaFclts.length;
