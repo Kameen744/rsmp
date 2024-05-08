@@ -18,6 +18,7 @@ export const useMainStore = defineStore('useMainStore', {
     programAreas: null,
     supportTypes: null,
     currentSupports: {},
+    viewingMap: null,
     cso: 'all',
     mapData: {},
     chartData: null,
@@ -59,10 +60,10 @@ export const useMainStore = defineStore('useMainStore', {
   actions: {
 
     login(email, password) {
-      this.loginProcess = true;
+      // this.loginProcess = true;
       return axios.post(`${this.baseUrl}.login`, {
         'email': email, 'password': password
-      })
+      });
     },
 
     generateChartLabels(e) {
@@ -84,7 +85,7 @@ export const useMainStore = defineStore('useMainStore', {
       return formattedDate;
     },
 
-    async logout(email) {
+    async logout() {
       const authUser = JSON.parse(localStorage.getItem('authUser'))
       localStorage.removeItem('authUser');
       const config = {
@@ -93,7 +94,7 @@ export const useMainStore = defineStore('useMainStore', {
         }
       }
 
-      const data = { email: email }
+      const data = { email: authUser.email }
 
       await axios.post(`${this.baseUrl}.logout`, data, config).then((res) => {
         localStorage.clear();
@@ -627,8 +628,12 @@ export const useMainStore = defineStore('useMainStore', {
 
 
     resetMapHighlight(e) {
-      this.geoJson.resetStyle(e.target);
-      this.mapInfo.update();
+      if(this.viewingMap && this.viewingMap.feature.id == e.target.feature.id) {
+        return;
+      } else {
+        this.geoJson.resetStyle(e.target);
+        this.mapInfo.update();
+      }
     },
 
     // Define a function for fade-in animation
@@ -689,6 +694,9 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     highlightMapFeature(e) {
+      if(this.viewingMap) {
+        return;
+      }
       var layer = e.target;
       // layer.openPopup();
       // layer.bindTooltip()
@@ -699,6 +707,7 @@ export const useMainStore = defineStore('useMainStore', {
       `);
       layer.bindTooltip(tlt);
       layer.openTooltip();
+      
       layer.setStyle({
         weight: 1,
         color: '#98A94A',
@@ -727,13 +736,18 @@ export const useMainStore = defineStore('useMainStore', {
         dataSet['supports'] = mpd.data[dataSet.state][dataSet.LGA];
         this.selectedLgaMarker = dataSet;
       }
+
       let layer = e.target;
+
+      // this.geoJson.resetStyle(layer);
+      // this.mapInfo.update();
+      this.viewingMap = layer;
+
       layer.setStyle({
         weight: 1,
         color: 'red',
-        backgroundColor: 'red',
         dashArray: '',
-        fillOpacity: 0.8
+        fillOpacity: 1
       });
       // this.geoJson.resetStyle(e.target);
       
@@ -835,6 +849,10 @@ export const useMainStore = defineStore('useMainStore', {
     closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
+      
+      this.geoJson.resetStyle(this.viewingMap);
+    
+      this.viewingMap = null;
       this.map.flyToBounds(this.geoJson, { duration: 0.2 });
     },
 
@@ -979,23 +997,6 @@ export const useMainStore = defineStore('useMainStore', {
     resetlgaMapHighlight(e) {
       this.geoJson.resetStyle(e.target);
       this.mapInfo.update();
-    },
-
-    getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
-      var R = 6371; // Radius of the earth in km
-      var dLat = this.deg2rad(lat2 - lat1);
-      var dLon = this.deg2rad(lon2 - lon1);
-      var a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      var d = R * c; // Distance in km
-      return d;
-    },
-    
-    deg2rad(deg) {
-      return deg * (Math.PI / 180);
     },
 
     onEachMapFeature(feature, layer) {

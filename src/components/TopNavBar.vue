@@ -27,7 +27,10 @@
               CSO Dashboard</a>
           </li> -->
           <li>
-            <button class="btn btn-md bg-white text-lg rounded-none">Logout</button>
+            <button class="relative btn btn-md bg-white text-lg rounded-none" @click="logout">
+              <b class="">Logout</b> 
+              <span v-show="logginOut" class="loading loading-spinner text-info absolute top-[25%] right-[10%]"></span>
+            </button>
           </li>
         </ul>
       </div>
@@ -37,10 +40,13 @@
 
 <script setup>
 import { useMainStore } from "./../storage/store";
+import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref} from 'vue';
 
 const store = useMainStore();
+const router = useRouter();
+const logginOut = ref(false);
 
 const changeView = async (v) => {
   view.value = v;
@@ -61,6 +67,13 @@ const changeView = async (v) => {
   selectedSupports.value[v] = [];
   selectedStatus.value[v] = [];
   await store.updateApp();
+}
+
+const logout = async () => {
+  logginOut.value = true;
+  await store.logout();
+  router.push({ name: 'login' });
+  logginOut.value = !logginOut.value
 }
 
 const {
