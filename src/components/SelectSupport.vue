@@ -17,7 +17,7 @@
         </b>
       </div>
       <ul tabindex="0" class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec">
-        <li class="rounded-none border-b-2 border-blue-50" v-for="support in supportTypes">
+        <li class="rounded-none border-b-2 border-blue-50" v-for="support in supportTypes" :class="store.selected(selectedSupports[view], support.name) ? 'bg-blue-300': ''">
           <a href="" @click.prevent="SelectSupport(support)" class="hover:rounded-none text-lg inline-flex justify-between">
             <span>{{ support.name }}</span>
             <b class="w-8 h-8 rounded-full pr-1 bg-blue-200 text-center text-xs text-blue-900">
@@ -52,6 +52,6 @@ const SelectSupport = (support) => {
 }
 
 const {
-  selectedSupports, view, supportTypes
+  selectedSupports, view, supportTypes, selected
 } =  storeToRefs(store);
 </script>

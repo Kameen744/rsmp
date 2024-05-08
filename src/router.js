@@ -5,11 +5,11 @@ import Home from '@/Home.vue'
 // import PartnerView from '@/PartnerView.vue'
 
 const routes = [
-  {
-    path: '/login',
-    name: 'login',
-    component: Login
-  },
+  // {
+  //   path: '/',
+  //   name: 'login',
+  //   component: Login
+  // },
   {
     path: '/',
     name: 'home',

@@ -3,7 +3,7 @@
     <div class="container mx-auto max-w-[90%]">
       <div class="flex-1">
         <a class="p-0 cursor-pointer">
-          <img src="./../assets/rsmp-logo.png" alt="Logo" class="h-[3.9rem]">
+          <img src="./../assets/rsmp-logo.svg" alt="Logo" class="h-[3.9rem]">
         </a>
       </div>
   

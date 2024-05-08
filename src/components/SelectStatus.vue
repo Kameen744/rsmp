@@ -17,7 +17,7 @@
         </b>
       </div>
       <ul tabindex="0" class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec">
-        <li class="rounded-none border-b-2 border-blue-50" v-for="status in statusOptions">
+        <li class="rounded-none border-b-2 border-blue-50" v-for="status in statusOptions" :class="store.selected(selectedStatus[view], status) ? 'bg-blue-300': ''">
           <a href="" @click.prevent="Selectstatus(status)" class="hover:rounded-none text-lg inline-flex justify-between">
             <span>{{ status }}</span>
             <b class="w-8 h-8 rounded-full pr-1 bg-blue-200 text-center text-xs text-blue-900">
@@ -53,6 +53,6 @@ const Selectstatus = (status) => {
 }
 
 const {
-  selectedStatus, view 
+  selectedStatus, view, selected
 } =  storeToRefs(store);
 </script>

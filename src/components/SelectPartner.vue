@@ -18,7 +18,7 @@
       </div>
       <ul tabindex="0" class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec">
         <template v-for="partner in partners">
-          <li class="rounded-none border-b-2 border-blue-50" v-if="filterPartners(partner)">
+          <li class="rounded-none border-b-2 border-blue-50" v-if="filterPartners(partner)" :class="store.selected(selectedPartners[view], partner.partner) ? 'bg-blue-300': ''">
             <a href="" @click.prevent="SelectPartner(partner)" class="hover:rounded-none text-lg inline-flex justify-between">
               <span>{{ partner.short_name }}</span>
               <b class="w-8 h-8 rounded-full pr-1 bg-blue-200 text-center text-xs text-blue-900">
