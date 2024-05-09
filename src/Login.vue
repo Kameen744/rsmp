@@ -1,6 +1,6 @@
 <template>
-  <div class=" sm:grid md:flex items-center justify-end h-screen bg-blue-700 p-16">
-    <div class="space-y-6 mr-10 p-4 min-w-[350px]">
+  <div class="bg-login sm:grid md:flex items-center justify-center h-screen bg-blue-700 p-4">
+    <div class="space-y-6 p-8 min-w-[350px] bg-blue-700">
         <h2 class=" text-3xl text-white">Login</h2>
         <div>
           <label for="email" class="block mb-2 text-sm font-medium text-white">Email Address</label>
@@ -15,24 +15,24 @@
           <span v-show="loginProcess" class="loading loading-spinner text-info absolute top-[25%] right-[10%]"></span>
         </button>
     </div>
-    <div class="bg-slate-200 p-10 rounded-lg shadow-lg min-h-[400px] max-w-[500px]">
+    <div class="bg-slate-200 p-8 py-4 rounded-lg shadow-xl min-h-[400px] max-w-[800px]">
       <div>
-        <img src="./assets/rsmp-logo2.svg" alt="logo" class="h-[70px]">
+        <img :src="logo" alt="logo" class="h-[70px]">
       </div>
-      <div class="flext justify-between items-center mt-8">
+      <div class="flext justify-between items-center mt-4">
         
-        <div class="max-w-3xl mx-auto bg-transparent p-4 rounded shadow-md">
-            <h1 class="text-2xl font-bold mb-4">Healthcare Support Dashboard</h1>
-            <p class="text-base mb-4">
+        
+          <h1 class="text-2xl font-bold mb-4">Healthcare Support Dashboard</h1>
+            <p class=" text-lg mb-4">
               The US-CDC, in collaboration with Sydani Group, aims to enhance the visibility of health care support by different implementing partners in Niger state. 
             </p>
-            <p class="text-base mb-4">
+            <p class=" text-lg mb-4">
               This support seeks to facilitate the strategic and optimal allocation of technical and financial partner resources to program areas within the state. 
             </p>
-            <p class="text-base">  
+            <p class=" text-lg">  
               Through this partner mapping dashboard, stakeholders can gain insights into existing partnerships, streamline collaboration efforts, and ensure optimal resource utilization for improved healthcare delivery.
             </p>
-        </div>
+        
       
       </div>
     </div>
@@ -43,7 +43,8 @@
 import { useMainStore } from "./storage/store";
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
-
+import logo from './assets/rsmp-logo2.svg';
+import bgImg from './assets/bg-img.svg';
 const router = useRouter();
 const store = useMainStore();
 const email = ref('');
@@ -69,3 +70,12 @@ const login = async () => {
 }
 
 </script>
+
+<style scoped>
+.bg-login {
+  background-image: url('./assets/bg-img.svg');
+  /* background-position: 50%; */
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+</style>

@@ -231,7 +231,7 @@ export const useMainStore = defineStore('useMainStore', {
           let patnerChartDiv = document.createElement('div');
           let chartOption = t.getChartJsOptions(rawData.total_lgas);
           
-          chartDiv.className = 'bg-white p-4 mb-3 overflow-x-scroll';
+          chartDiv.className = 'bg-white p-4 mb-3 overflow-x-scroll c-scroll';
           patnerChartDiv.className = 'relative flex h-full';
           chartTitle.className = 'text-lg pb-3 font-bold';
           chartTitle.innerText = progArea;
@@ -849,9 +849,9 @@ export const useMainStore = defineStore('useMainStore', {
     closePopup() {
       this.selectedLgaMarker = null;
       this.selectedMarker = null;
-      
-      this.geoJson.resetStyle(this.viewingMap);
-    
+      if(this.viewingMap) {
+        this.geoJson.resetStyle(this.viewingMap);
+      }
       this.viewingMap = null;
       this.map.flyToBounds(this.geoJson, { duration: 0.2 });
     },

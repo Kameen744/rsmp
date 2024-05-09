@@ -4,7 +4,7 @@
       <div tabindex="0" role="button" class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec min-w-36">
         <div class="inline-flex max-w-28 overflow-hidden">
           <div class="text-nowrap">
-            {{selectedPrograms[view][0] ? selectedPrograms[view][0]: 'Program Area'}} 
+            {{selectedPrograms[view].length > 0 ? selectedPrograms[view][0]: 'Program Area'}} 
           </div>
         </div>
         <b class="ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900">
@@ -38,9 +38,11 @@ import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 const store = useMainStore();
 const dropped = ref(false);
+
 const toggleDroped = () => {
   dropped.value = !dropped.value;
 }
+
 const SelectProgram = (program) => {
   if(program) {
     selectedPrograms.value[view.value] = [program.service];

@@ -3,7 +3,7 @@
     <div class="container mx-auto max-w-[90%]">
       <div class="flex-1">
         <a class="p-0 cursor-pointer">
-          <img src="./../assets/rsmp-logo.svg" alt="Logo" class="h-[3.9rem]">
+          <img :src="logo" alt="Logo" class="h-[3.9rem]">
         </a>
       </div>
   
@@ -43,6 +43,7 @@ import { useMainStore } from "./../storage/store";
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref} from 'vue';
+import logo from './../assets/rsmp-logo.svg';
 
 const store = useMainStore();
 const router = useRouter();
@@ -50,22 +51,23 @@ const logginOut = ref(false);
 
 const changeView = async (v) => {
   view.value = v;
-  store.closePopup();
   selectedState.value[v] = 'Niger';
   selectedLga.value[v] = ''
-  if(view.value == 'map') {
+  selectedPartners.value[v] = [];
+  selectedSupports.value[v] = [];
+  selectedStatus.value[v] = [];
+
+  if(v == 'map') {
     selectedPrograms.value[v] = ['NiCare'];
   } else {
-    if(view.value=='cso') {
-      cso = 'only';
+    if(v=='cso') {
+      cso.value = 'only';
     } else {
       cso.value = 'non';
     }
     selectedPrograms.value[v] = [];
   }
-  selectedPartners.value[v] = [];
-  selectedSupports.value[v] = [];
-  selectedStatus.value[v] = [];
+  store.closePopup();
   await store.updateApp();
 }
 

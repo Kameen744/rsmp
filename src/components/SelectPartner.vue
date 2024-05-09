@@ -42,7 +42,6 @@ import { onMounted, ref } from 'vue';
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 const store = useMainStore();
-
 const filterPartners = (pt) => {
   if(view.value == 'chart' && pt.cso_partner == '1') {
     return false;

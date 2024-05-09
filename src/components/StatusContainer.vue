@@ -11,7 +11,7 @@
     <div class="flex justify-between pr-0 bg-white p-4">
         <!-- v-if="chartCleanedData.length > 0" -->
         <!-- v-for="(val, key) in verifySpList()" -->
-        <div class="flex justify-start" v-if="currentSupports[view]">
+        <div class="flex justify-start overflow-x-auto c-scroll" v-if="currentSupports[view]">
           <label 
             class="p-3 py-2 text-cyan-50 m-2" 
             v-for="(val, key) in currentSupports[view]" :style="`background: ${val.bg};`">

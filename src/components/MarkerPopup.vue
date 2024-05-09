@@ -1,6 +1,6 @@
 <template>
   <div class="z-[999] fixed bottom-3 right-3 grid grid-cols-4 gap-1 shadow bg-transparent">
-    <div class="grid col-span-3 bg-white p-2 max-h-[400px] overflow-y-auto">
+    <div class="grid col-span-3 bg-white p-2 max-h-[400px] overflow-y-auto c-scroll">
         <div class=" border-blue-600 border-solid border-2">
           <h1 class="text-2xl text-center font-bold" v-if="selectedMarker">{{ selectedMarker.lga }} LGA</h1>
           <h1 class="text-2xl text-center font-bold" v-if="selectedLgaMarker">{{ selectedLgaMarker.LGA }} LGA</h1>
@@ -15,16 +15,6 @@
                     <th class="py-2 px-4 text-white font-thin">Status</th>
                 </tr>
             </thead>
-            <!-- 'lga': lga,
-                  'program_area': row.program_area,
-                  'partner': row.partner,
-                  'type_of_support': row.type_of_support,
-                  'cso_support': row.cso_support,
-                  'start_date': row.start_date,
-                  'end_date': row.end_date,
-                  'status': row.status,
-                  'duration_in_months': row.duration_in_months,
-                  'remaining_months': row.remaining_months -->
             <tbody>
               <template v-if="selectedMarker">
                 <tr class="bg-blue-50">

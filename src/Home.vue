@@ -3,7 +3,7 @@
     <TopNavBar></TopNavBar>
     <FiltersContainer></FiltersContainer>  
     <div 
-      class="bg-slate-100 max-h-[77vh] overflow-hidden overflow-y-auto" 
+      class="bg-slate-100 max-h-[77vh] overflow-hidden overflow-y-auto c-scroll" 
       :class="view=='map'?'':'pt-2'" v-on:scroll="store.scrollDataContainer">
       <StatusContainer 
         :key="chartCleanedData" 

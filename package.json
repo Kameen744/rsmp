@@ -1,5 +1,6 @@
 {
   "name": "rsm",
+  "homepage": "https://resourcemapping.sydani.org/assets/rsmp/",
   "private": true,
   "version": "0.0.0",
   "type": "module",

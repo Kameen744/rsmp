@@ -40,6 +40,7 @@ import { onMounted, ref } from 'vue';
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
 const store = useMainStore();
+
 const SelectSupport = (support) => {
   let sspt = selectedSupports.value[view.value];
   if(!sspt.includes(support.name)) {
