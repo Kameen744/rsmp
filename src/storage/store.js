@@ -515,7 +515,7 @@ export const useMainStore = defineStore('useMainStore', {
 
     async fetchMapData() {
       let url = `support_duration?`
-      let partners_param = '&partner=';
+      let partners_param = '&partners=';
       let programs_param = '&program_area=';
       let support_param = '&support_types=';
       let status_param = '&support_status='
