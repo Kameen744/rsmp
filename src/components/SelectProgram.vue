@@ -1,6 +1,8 @@
 <template>
   <template class="min-[3rem]: flex justify-start">
-    <div class="dropdown dropdown-bottom" @click="toggleDroped" @mouseleave="dropped=false">
+    <div class="relative dropdown dropdown-bottom" @click="toggleDroped" @mouseleave="dropped=false">
+      <!-- <span class="absolute top-[-5px] left-1/2 -translate-x-1/2 bg-blue-600 rounded text-white border-0 text-xs px-2 pb-1">Program Area</span> -->
+      <SelectBadge title="Program Areas" v-if="selectedPrograms[view].length > 0"></SelectBadge>
       <div tabindex="0" role="button" class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec min-w-36">
         <div class="inline-flex max-w-28 overflow-hidden">
           <div class="text-nowrap">
@@ -17,9 +19,10 @@
         </b>
       </div>
       <ul tabindex="0" class="dropdown-content z-[99999] menu p-2 shadow-lg bg-base-100 rounded-none max-h-[70vh] grid overflow-x-auto border-2 border-rsmp-sec" v-if="dropped">
-        <li class="rounded-none border-b-2 border-blue-50" v-if="view == 'chart'">
+        <!-- v-if="view == 'chart'"S -->
+        <li class="rounded-none border-b-2 border-blue-50">
           <a href="" @click.prevent="SelectProgram(null)" class="hover:rounded-none text-lg">
-            Program Area
+            Select All
           </a>
         </li>
         <li class="rounded-none border-b-2 border-blue-50" v-for="program in programAreas">
@@ -36,6 +39,7 @@
 import { onMounted, ref } from 'vue';
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
+import SelectBadge from './SelectBadge.vue';
 const store = useMainStore();
 const dropped = ref(false);
 

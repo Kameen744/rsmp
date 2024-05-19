@@ -55,7 +55,7 @@ const changeView = async (v) => {
   selectedLga.value[v] = ''
   selectedPartners.value[v] = [];
   selectedSupports.value[v] = [];
-  selectedStatus.value[v] = [];
+  selectedStatus.value[v] = ['Ongoing'];
 
   if(v == 'map') {
     selectedPrograms.value[v] = ['NiCare'];

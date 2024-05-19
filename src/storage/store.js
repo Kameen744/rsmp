@@ -514,11 +514,11 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     async fetchMapData() {
-      let url = `support_duration?`
+      let url = `support_duration?`;
       let partners_param = '&partners=';
       let programs_param = '&program_area=';
       let support_param = '&support_types=';
-      let status_param = '&support_status='
+      let status_param = '&support_status=';
       let pts = this.selectedPartners[this.view];
       let prgs = this.selectedPrograms[this.view];
       let spts = this.selectedSupports[this.view];

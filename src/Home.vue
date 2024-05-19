@@ -32,10 +32,10 @@ const ready = ref(false);
 onMounted(() => {
   selectedState.value[view.value] = 'Niger';
   selectedLga.value[view.value] = '' 
-  selectedPrograms.value[view.value] = ['NiCare'];
+  selectedPrograms.value[view.value] = ['Routine Immunization'];
   selectedPartners.value[view.value] = []; 
   selectedSupports.value[view.value] = [];
-  selectedStatus.value[view.value] = [];
+  selectedStatus.value[view.value] = ['Ongoing'];
   ready.value = true;
 })
 

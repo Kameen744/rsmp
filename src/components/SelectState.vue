@@ -1,6 +1,7 @@
 <template>
   <template class="min-[3rem]: flex justify-start">
     <div class="dropdown dropdown-bottom" @click="toggleDroped" @mouseleave="dropped=false">
+      <SelectBadge title="States" v-if="selectedState[view]"></SelectBadge>
       <div tabindex="0" role="button" class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec min-w-36">
         <div class="inline-flex max-w-28 overflow-hidden">
         {{selectedState[view] ? selectedState[view] : 'State'}} 
@@ -34,6 +35,8 @@
 import { onMounted, ref } from 'vue';
 import { useMainStore } from "./../storage/store";
 import { storeToRefs } from 'pinia';
+import SelectBadge from './SelectBadge.vue';
+
 const store = useMainStore();
 const dropped = ref(false);
 const toggleDroped = () => {
