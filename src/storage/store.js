@@ -519,6 +519,7 @@ export const useMainStore = defineStore('useMainStore', {
       let programs_param = '&program_area=';
       let support_param = '&support_types=';
       let status_param = '&support_status=';
+
       let pts = this.selectedPartners[this.view];
       let prgs = this.selectedPrograms[this.view];
       let spts = this.selectedSupports[this.view];
@@ -528,8 +529,8 @@ export const useMainStore = defineStore('useMainStore', {
         partners_param += `${part},`
       });
 
-      prgs.forEach((part) => {
-        programs_param += `${part},`
+      prgs.forEach((prg) => {
+        programs_param += `${prg},`
       });
 
       spts.forEach((sp) => {
@@ -562,9 +563,7 @@ export const useMainStore = defineStore('useMainStore', {
       }
 
       url += `&cso=${this.cso}`
-      // date filter
-      // url += `&start_date=${this.selectedStartDate}&end_date=${this.selectedEndDate}`
-      
+     
       await this.fetch(url).then(async (res) => {
         this.mapData[this.view] = null;
         this.mapData[this.view] = res.data;
