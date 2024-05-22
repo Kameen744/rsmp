@@ -4,8 +4,8 @@
       <ul class="menu menu-horizontal flex p-0 py-2 justify-center">
         <SelectState></SelectState>
         <SelectLga></SelectLga>
-        <SelectProgram></SelectProgram>
         <SelectPartner></SelectPartner>
+        <SelectProgram></SelectProgram>
         <SelectSupport></SelectSupport>
         <SelectStatus></SelectStatus>
         <!-- <selectStartDate></selectStartDate>
