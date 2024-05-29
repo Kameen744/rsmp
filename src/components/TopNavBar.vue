@@ -3,30 +3,21 @@
     <div class="container mx-auto max-w-[90%]">
       <div class="flex-1">
         <a class="p-0 cursor-pointer">
-          <img :src="logo" alt="Logo" class="h-[3.9rem]">
+          <img :src="logo" alt="Logo" class="max-h-[5rem]">
         </a>
       </div>
   
       <div class="flex-none gap-2">
         <ul class="menu menu-horizontal px-1">
-          <li class="mr-[2rem]">
-            <a href="" @click.prevent="changeView('map')" 
-                class="text-white text-xl font-extrabold rounded-none" :class="view=='map'?'active':''">
-              Map View
+
+          <li class="mr-[2rem]" v-for="link in links">
+            <a href="" @click.prevent="changeView(link.name)" 
+                class="text-white text-xl font-extrabold rounded-none" :class="view==link.name?'active':''">
+              {{ link.title }}
             </a>
           </li>
-          <li class="mr-[2rem]">
-            <a href="" @click.prevent="changeView('chart')" 
-                class="text-white text-xl rounded-none" :class="view=='chart'?'active':''">
-              Partner Dashboard
-            </a> 
-          </li>
-          <!-- <li class="mr-[5rem]">
-            <a href="#" @click.prevent="changeView('cso')"
-                class=" text-white text-xl rounded-none">
-              CSO Dashboard</a>
-          </li> -->
-          <li>
+         
+          <li class="flex-wrap">
             <button class="relative btn btn-md bg-white text-lg rounded-none" @click="logout">
               <b class="">Logout</b> 
               <span v-show="logginOut" class="loading loading-spinner text-info absolute top-[25%] right-[10%]"></span>
@@ -43,11 +34,18 @@ import { useMainStore } from "./../storage/store";
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref} from 'vue';
-import logo from './../assets/rsmp-logo.svg';
+import logo from './../assets/logo.jpg';
 
 const store = useMainStore();
 const router = useRouter();
 const logginOut = ref(false);
+
+const links = [
+  {name: 'map', title: 'Map View'},
+  // {name: 'ptins', title: 'Parnter Insight'},
+  {name: 'chart', title: 'Partner Dashboard'},
+  // {name: 'cso', title: 'CSO Dashboard'},
+]
 
 const changeView = async (v) => {
   view.value = v;
@@ -58,7 +56,7 @@ const changeView = async (v) => {
   selectedStatus.value[v] = ['Ongoing'];
 
   if(v == 'map') {
-    selectedPrograms.value[v] = ['NiCare'];
+    selectedPrograms.value[v] = ['Routine Immunization'];
   } else {
     if(v=='cso') {
       cso.value = 'only';

@@ -11,6 +11,7 @@
       <MapContainer v-show="view == 'map'"></MapContainer>
       <PartnerContainer v-if="view == 'chart'"></PartnerContainer>
       <CsoContainer v-if="view == 'cso'"></CsoContainer>
+      <PartnerInsContainer v-if="view == 'ptins'"></PartnerInsContainer>
     </div>
   </template>
 </template>
@@ -25,6 +26,7 @@ import StatusContainer from './components/StatusContainer.vue';
 import MapContainer from './components/MapContainer.vue';
 import PartnerContainer from './components/PartnerContainer.vue';
 import CsoContainer from "./components/CsoContainer.vue";
+import PartnerInsContainer from "./components/PartnerInsContainer.vue";
 
 const store = useMainStore();
 const ready = ref(false);

@@ -3,6 +3,7 @@ import Chart from 'chart.js/auto'
 import axios from "axios";
 import { marker, tooltip } from "leaflet";
 import { toRaw } from "vue";
+
 Chart.defaults.datasets.bar.maxBarThickness = 25;
 
 export const useMainStore = defineStore('useMainStore', {
@@ -96,8 +97,9 @@ export const useMainStore = defineStore('useMainStore', {
 
       const data = { email: authUser.email }
 
-      await axios.post(`${this.baseUrl}.logout`, data, config).then((res) => {
+      axios.post(`${this.baseUrl}.logout`, data, config).then((res) => {
         localStorage.clear();
+        window.location.reload();
       });
     },
 
@@ -601,7 +603,7 @@ export const useMainStore = defineStore('useMainStore', {
         this.mapContainerRef.innerHTML = '';
         await this.createMap();
         // await this.createDataPoints();
-      } else {
+      } else if(this.view == 'chart') {
         // this.selectedPrograms = null;
         this.chartDataKeys = Object.keys(
           this.mapData[this.view]['data']
@@ -610,6 +612,8 @@ export const useMainStore = defineStore('useMainStore', {
         // console.log(this.chartDataKeys);
         this.chartCleanedData = [];
         this.initChart();
+      } else {
+        
       }
       this.isLaoding = false;
     },
@@ -858,7 +862,7 @@ export const useMainStore = defineStore('useMainStore', {
     markerEvent(e) {
       this.selectedLgaMarker = null;
       this.selectedMarker = e.target.options.icon.options.icData;
-      // console.log(this.selectedMarker);
+      // console.log('selected mark: ', this.selectedMarker);
     },
 
     async createDataPoints() {
@@ -1067,9 +1071,11 @@ export const useMainStore = defineStore('useMainStore', {
               'lga': lg,
               'type_of_support': d.type_of_support,
               'partner': d.partner,
+              'program_area': d.program_area,
               'status': d.status,
               'start_date': d.start_date,
-              'end_date': d.end_date
+              'end_date': d.end_date,
+              'summary_of_support': d.summary_of_support
             }
             
             let icon = L.divIcon({

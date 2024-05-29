@@ -15,9 +15,9 @@
           <span v-show="loginProcess" class="loading loading-spinner text-info absolute top-[25%] right-[10%]"></span>
         </button>
     </div>
-    <div class="bg-slate-200 p-8 py-4 rounded-lg shadow-xl min-h-[400px] max-w-[800px]">
+    <div class="bg-white p-8 py-4 rounded-lg shadow-xl min-h-[400px] max-w-[800px]">
       <div>
-        <img :src="logo" alt="logo" class="h-[70px]">
+        <img :src="logo" alt="logo" class="max-h-[80px]">
       </div>
       <div class="flext justify-between items-center mt-4">
         
@@ -43,7 +43,7 @@
 import { useMainStore } from "./storage/store";
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
-import logo from './assets/rsmp-logo2.svg';
+import logo from './assets/logo2.jpg';
 import bgImg from './assets/bg-img.svg';
 const router = useRouter();
 const store = useMainStore();
