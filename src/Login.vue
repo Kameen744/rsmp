@@ -17,23 +17,26 @@
     </div>
     <div class="bg-white p-8 py-4 rounded-lg shadow-xl min-h-[400px] max-w-[800px]">
       <div>
-        <img :src="logo" alt="logo" class="max-h-[80px]">
+        <img :src="logo" alt="logo" class="max-h-[100px]">
       </div>
       <div class="flext justify-between items-center mt-4">
-        
-        
-          <h1 class="text-2xl font-bold mb-4">Healthcare Support Dashboard</h1>
-            <p class=" text-lg mb-4">
-              The US-CDC, in collaboration with Sydani Group, aims to enhance the visibility of health care support by different implementing partners in Niger state. 
-            </p>
-            <p class=" text-lg mb-4">
-              This support seeks to facilitate the strategic and optimal allocation of technical and financial partner resources to program areas within the state. 
-            </p>
-            <p class=" text-lg">  
-              Through this partner mapping dashboard, stakeholders can gain insights into existing partnerships, streamline collaboration efforts, and ensure optimal resource utilization for improved healthcare delivery.
-            </p>
-        
-      
+          <h1 class="text-2xl font-bold mb-4">
+            Healthcare Support Dashboard
+          </h1>
+          <p class=" text-lg mb-4">
+            The US-CDC, in collaboration with Sydani Group, aims to enhance the visibility of health care support by different implementing partners in Niger state. 
+          </p>
+          <p class=" text-lg mb-4">
+            This support seeks to facilitate the strategic and optimal allocation of technical and financial partner resources to program areas within the state. 
+          </p>
+          <p class=" text-lg">  
+            Through this partner mapping dashboard, stakeholders can gain insights into existing partnerships, streamline collaboration efforts, and ensure optimal resource utilization for improved healthcare delivery.
+          </p>
+      </div>
+      <div class=" divider"></div>
+      <div class="flex justify-center gap-8">
+        <img class="max-h-[50px]" :src="nphcda">
+        <img class="max-h-[50px]" :src="sydani">
       </div>
     </div>
   </div>
@@ -43,7 +46,9 @@
 import { useMainStore } from "./storage/store";
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
-import logo from './assets/logo2.jpg';
+import logo from './assets/logo2.svg';
+import sydani from './assets/sydani.png';
+import nphcda from './assets/nphcda.png';
 import bgImg from './assets/bg-img.svg';
 const router = useRouter();
 const store = useMainStore();

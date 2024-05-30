@@ -45,8 +45,14 @@
         </table>
     </div> -->
 
-    <div class="grid bg-white shadow-md p-2 max-h-[400px] max-w-[75vw] overflow-y-auto c-scroll">
-      <div class="border-blue-600 border-solid border-2">
+    <div class="grid bg-white shadow-md p-2 max-h-[400px] w-[73vw] overflow-y-auto c-scroll">
+      <b @click="store.closePopup" class="z-[99] cursor-pointer absolute top-[-10px] right-[-10px] shadow-lg hover:bg-slate-200 ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mt-1 ml-1 w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </b>
+      
+      <div class="border-blue-600 border-solid border-2 static">
         <h1 class="text-2xl text-center font-bold" v-if="selectedMarker">{{ selectedMarker.lga }} LGA</h1>
         <h1 class="text-2xl text-center font-bold" v-if="selectedLgaMarker">{{ selectedLgaMarker.LGA }} LGA</h1>
       </div>
@@ -73,33 +79,39 @@
           <div class="overflow-hidden border-y py-1 border-white px-3 w-[110px]">{{ selectedMarker.end_date }}</div>
           <div class="overflow-hidden border-y py-1 border-white px-3 w-[80px]">{{ selectedMarker.status }}</div>
           <br>
-          <div class="flex-full py-2 px-4" v-if="collapseKey==key">
-            <h1 class=" block font-bold text-lg">Support Summary</h1>
-            <p>{{ selectedMarker.summary_of_support }}</p>
-          </div>
+          <Transition>
+            <div class="flex-full py-2 px-4" v-if="collapseKey==key">
+              <h1 class=" block font-bold text-lg">Support Summary</h1>
+              <p>{{ selectedMarker.summary_of_support }}</p>
+            </div>
+          </Transition>
         </div>
       </template>
+
       <template v-if="selectedLgaMarker">
-        <div class="flex flex-wrap rounded-none bg-blue-100 text-left hover:bg-blue-50 cursor-pointer" 
-        v-for="(val, key) in selectedLgaMarker.supports" :key="key+1" @click="expand(key+1)" :class="collapseKey==key?'bg-blue-50':'bg-blue-100'">
-        <div class="overflow-hidden border-y py-1 w-[250px] border-white px-3 flex justify-start">
-            <span class="inline-block w-3 h-3 m-0 rounded-full mr-1 mt-2" :style="`background: ${getSpBg(val.type_of_support)} `"></span>
-            {{ val.type_of_support }} 
-        </div>
-        <div class="overflow-hidden border-y py-1 border-white px-3 w-[200px]">{{ val.program_area }}</div>
-        <div class="overflow-hidden border-y py-1 border-white px-3 w-[300px]">{{ val.partner }}</div>
-        <div class="overflow-hidden border-y py-1 border-white px-3 w-[110px]">{{ val.start_date }}</div>
-        <div class="overflow-hidden border-y py-1 border-white px-3 w-[110px]">{{ val.end_date }}</div>
-        <div class="overflow-hidden border-y py-1 border-white px-3 w-[80px]">{{ val.status }}</div>
-        <br>
-        <div class="flex-full py-4 px-8" v-if="collapseKey==key+1">
-          <h1 class="block font-bold text-lg mb-2">Support Summary</h1>
-          <p class="">{{ val.summary_of_support }}</p>
-        </div>
+        <div class="flex flex-wrap rounded-none relative bg-blue-100 text-left hover:bg-blue-50 cursor-pointer" 
+          v-for="(val, key) in selectedLgaMarker.supports" :key="key+1" @click="expand(key+1)" :class="collapseKey==key?'bg-blue-50':'bg-blue-100'">
+          <div class="overflow-hidden border-y py-1 w-[250px] border-white px-3 flex justify-start">
+              <span class="inline-block w-3 h-3 m-0 rounded-full mr-1 mt-2" :style="`background: ${getSpBg(val.type_of_support)} `"></span>
+              {{ val.type_of_support }} 
+          </div>
+          <div class="overflow-hidden border-y py-1 border-white px-3 w-[200px]">{{ val.program_area }}</div>
+          <div class="overflow-hidden border-y py-1 border-white px-3 w-[300px]">{{ val.partner }}</div>
+          <div class="overflow-hidden border-y py-1 border-white px-3 w-[110px]">{{ val.start_date }}</div>
+          <div class="overflow-hidden border-y py-1 border-white px-3 w-[110px]">{{ val.end_date }}</div>
+          <div class="overflow-hidden border-y py-1 border-white px-3 w-[90px] flex">{{ val.status }}</div>
+          <br>
+          <Transition>
+            <div class="flex-full py-5 shadow-xl px-8" v-if="collapseKey==key+1">
+              <h1 class="block font-bold text-lg mb-2">Support Summary</h1>
+              <p class="">{{ val.summary_of_support }}</p>
+            </div>
+          </Transition>
         </div>
       </template>
     </div>
-    <div class=" bg-white px-2 max-h-[400px] overflow-hidden">
+
+    <!-- <div class=" bg-white px-2 max-h-[400px] overflow-hidden">
       <b @click="store.closePopup" class="cursor-pointer absolute top-1 right-1 ml-4 w-8 h-8 rounded-full bg-blue-200 text-center text-xs text-blue-900">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="mt-1 ml-1 w-6 h-6">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -120,7 +132,7 @@
           </li>
         </template> 
       </ul>
-    </div>
+    </div> -->
   
   </div>
 </template>

@@ -23,6 +23,7 @@ export const useMainStore = defineStore('useMainStore', {
     cso: 'all',
     mapData: {},
     chartData: null,
+    partnerSummaryData: {},
     chartMainContainerRef: null,
     chartMainContainerCSORef: null,
     statusContRef: null,
@@ -111,11 +112,13 @@ export const useMainStore = defineStore('useMainStore', {
     },
 
     scrollDataContainer(e) {
-      let scrollPos = e.target.scrollTop;
-      if(scrollPos >= 10.3) {
-        this.statusContRef.classList.add('sticky', 'top-[-20px]', 'z-[99]');
-      } else {
-        this.statusContRef.classList.remove('sticky', 'top-0', 'z-[99]');
+      if(this.view == 'chart') {
+        let scrollPos = e.target.scrollTop;
+        if(scrollPos >= 10.3) {
+          this.statusContRef.classList.add('sticky', 'top-[-20px]', 'z-[99]');
+        } else {
+          this.statusContRef.classList.remove('sticky', 'top-0', 'z-[99]');
+        }
       }
     },
 
@@ -612,9 +615,51 @@ export const useMainStore = defineStore('useMainStore', {
         // console.log(this.chartDataKeys);
         this.chartCleanedData = [];
         this.initChart();
-      } else {
-        
+      } else if(this.view == 'ptins') {
+        const that = this;
+        const insData = this.mapData[this.view]['data'];
+        // const insStates = Object.keys(insData);
+        // insStates.forEach((st) => {
+        //   console.log(insData[st]);
+        //   for(const lga in insData[st]) {
+        //     console.log(insData[st][])
+        //   }
+        // });
+
+        Object.keys(insData).forEach((st) => {
+          Object.keys(insData[st]).forEach((lg) => {
+            insData[st][lg].forEach((progData) => {
+              let prgArea = progData.program_area;
+              let partner = progData.partner;
+
+              if(!that.partnerSummaryData[prgArea]) {
+                that.partnerSummaryData[prgArea] = {};
+              }
+
+              if(!that.partnerSummaryData[prgArea][partner]) {
+                that.partnerSummaryData[prgArea][partner] = [];
+              }
+              
+              let hasSupport = that.partnerSummaryData[prgArea][partner]
+                .some(obj => obj.type_of_support === progData.type_of_support);
+              
+              if(!hasSupport) {
+                that.partnerSummaryData[prgArea][partner].push(progData);
+              }
+              // {
+              //   support: progData.type_of_support,
+              //   start_date: progData.start_date,
+              //   end_date: progData.end_date,
+              //   status: progData.status
+              // }
+            });
+          });
+        }); 
+
+        // console.log(this.partnerSummaryData);
+        // console.log(this.mapData[this.view]);  
       }
+
       this.isLaoding = false;
     },
 

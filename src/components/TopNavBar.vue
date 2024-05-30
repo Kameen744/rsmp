@@ -1,20 +1,24 @@
 <template>
   <div class="navbar h-[5rem] mt-0 bg-rsmp-sec">
-    <div class="container mx-auto max-w-[90%]">
-      <div class="flex-1">
-        <a class="p-0 cursor-pointer">
+    <div class="container flex justify-between mx-auto max-w-[90%]">
+      
+      <div class="flex">
+        <div class="p-0 cursor-pointer">
           <img :src="logo" alt="Logo" class="max-h-[5rem]">
-        </a>
+        </div>
+        <!-- <div class="p-0 cursor-pointer">
+          <img :src="niger" alt="Logo" class="max-h-[5rem]">
+        </div> -->
       </div>
   
-      <div class="flex-none gap-2">
+      <div class="flex-none gap-1">
         <ul class="menu menu-horizontal px-1">
 
-          <li class="mr-[2rem]" v-for="link in links">
-            <a href="" @click.prevent="changeView(link.name)" 
-                class="text-white text-xl font-extrabold rounded-none" :class="view==link.name?'active':''">
+          <li class="mr-[1rem]" v-for="link in links">
+            <button @click.prevent="changeView(link.name)" 
+                class="text-white btn text-xl font-extrabold rounded-none" :class="view==link.name?'btn-info':'btn-ghost'">
               {{ link.title }}
-            </a>
+            </button>
           </li>
          
           <li class="flex-wrap">
@@ -34,7 +38,8 @@ import { useMainStore } from "./../storage/store";
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { onMounted, ref} from 'vue';
-import logo from './../assets/logo.jpg';
+import logo from './../assets/logo.svg';
+// import niger from './../assets/niger.png';
 
 const store = useMainStore();
 const router = useRouter();
@@ -42,7 +47,7 @@ const logginOut = ref(false);
 
 const links = [
   {name: 'map', title: 'Map View'},
-  // {name: 'ptins', title: 'Parnter Insight'},
+  {name: 'ptins', title: 'Parnter Summary'},
   {name: 'chart', title: 'Partner Dashboard'},
   // {name: 'cso', title: 'CSO Dashboard'},
 ]
