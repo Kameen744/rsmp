@@ -5,13 +5,13 @@ FROM node:20-alpine AS build-stage
 WORKDIR /app
 
 # Step 3: Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY . .
 
 # Step 4: Install the dependencies
 RUN npm install
 
 # Step 5: Copy the rest of the application code to the working directory
-COPY . .
+# COPY . .
 
 # Step 6: Build the Vue.js application
 RUN npm run build
