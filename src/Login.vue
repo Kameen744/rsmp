@@ -34,10 +34,21 @@
           </p>
       </div>
       <div class=" divider"></div>
-      <div class="flex justify-center gap-8">
-        <img class="max-h-[50px]" :src="nphcda">
+      <!-- <div class="flex justify-center gap-8">
         <img class="max-h-[50px]" :src="sydani">
-      </div>
+      </div> -->
+      
+      <Carousel v-bind="settings" :breakpoints="breakpoints">
+        <Slide v-for="partner in partners" :key="partner">
+          <div class="carousel__item mx-3">
+            <img class="max-h-[120px]" :src="partner">
+          </div>
+        </Slide>
+
+        <template #addons>
+          <Navigation />
+        </template>
+      </Carousel>
     </div>
   </div>
 </template>
@@ -48,14 +59,47 @@ import { ref } from "vue";
 import { useRouter } from 'vue-router';
 import logo from './assets/logo2.svg';
 import sydani from './assets/sydani.png';
-import nphcda from './assets/nphcda.png';
+import chai from './assets/chai.png';
+import unicef from './assets/unicef.png';
+import cdc from './assets/cdc.png';
+import sfh from './assets/sfh.png';
+import chigari from './assets/chigari.png';
+import who from './assets/who.png';
 import bgImg from './assets/bg-img.svg';
+
+import { Carousel, Navigation, Slide } from 'vue3-carousel';
+import 'vue3-carousel/dist/carousel.css';
+
 const router = useRouter();
 const store = useMainStore();
 const email = ref('');
 const password = ref('');
 const authError = ref(false);
 const loginProcess = ref(false);
+
+const partners = [
+  cdc, sydani, who, unicef, chai, sfh, chigari
+]
+
+const settings = {
+  itemsToShow: 1,
+  autoplay: 3000,
+  transition: 700,
+  wrapAround: true,
+  pauseAutoplayOnHover: true,
+  snapAlign: 'center',
+}
+
+const breakpoints = {
+  700: {
+    itemsToShow: 3.5,
+    snapAlign: 'center',
+  },
+  1024: {
+    itemsToShow: 5,
+    snapAlign: 'start',
+  },
+}
 
 const login = async () => {
   loginProcess.value = true;

@@ -33,3 +33,7 @@
   opacity: 0;
   transform: translateY(-10%);
 }
+
+.carousel .carousel__prev, .carousel .carousel__next { 
+  display: none;
+}

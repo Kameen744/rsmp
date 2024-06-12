@@ -3,12 +3,12 @@
     <div class="min-h-[77vh] max-h-[77vh] p-8">
       
       <div class="bg-white rounded-none relative w-full h-fit p-4 mt-8 pt-11 shadow-md" 
-      v-for="prog in Object.keys(partnerSummaryData)">
-        <div class="absolute top-0 left-0 py-1 shadow px-3 bg-rsmp-sec text-white">
+      v-for="prog in Object.keys(partnerSummaryData)" :key="prog">
+        <div class="absolute w-full text-center top-0 text-2xl font-bold left-0 py-1 shadow px-3 bg-rsmp-sec text-white">
           {{ prog }}
         </div>
         <div class="bg-slate-100 rounded-none relative w-full h-fit p-4 mt-8 pt-11 shadow-md" v-for="part in Object.keys(partnerSummaryData[prog])">
-          <div class="absolute top-0 left-0 py-1 shadow px-3 bg-blue-900 text-white">
+          <div class="absolute top-0 text-lg left-0 py-1 shadow px-3 bg-blue-900 text-white">
             {{ part }}
           </div>
           <div v-for="(spt, key) in partnerSummaryData[prog][part]">

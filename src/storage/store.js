@@ -14,6 +14,7 @@ export const useMainStore = defineStore('useMainStore', {
     mapFit: 8,
     states: null,
     lgas: null,
+    supportsSummary: [],
     facilities: null,
     partners: null,
     programAreas: null,
@@ -150,6 +151,7 @@ export const useMainStore = defineStore('useMainStore', {
 
     chartTooltip (context) {
       const tooltipModel = context.tooltip;
+ 
       let tooltipEl = document.getElementById('chartjs-tooltip');
 
       // Create element on first render
@@ -165,21 +167,29 @@ export const useMainStore = defineStore('useMainStore', {
 
       let title = tooltipModel.title[0];
       let longTitle = this.getValFromData(this.partners, 'short_name', title);
+      
       if(longTitle == null) {
         
         longTitle = this.getValFromData(this.partners, 'partner', title);
-        console.log(longTitle, ' from if after');
-        console.log(this.partners, title);
+        // console.log(longTitle, ' from if after');
+        // console.log(this.partners, title);
       }
       longTitle = longTitle.partner;
 
       let val = tooltipModel.body[0].lines[0];
       val = val.split(':');
+      let support = val[0];
+      
+      let summary = this.supportsSummary.find((spt) => {
+        return support in spt && spt.partner == title;
+      });
 
       tooltipEl.innerHTML = `
         <div><b>Partner:</b> ${longTitle}</div>
         <hr class="p-0 m-0">
-        <div><b>Support:</b> ${val[0]}</div>
+        <div><b>Support:</b> ${support}</div>
+        <hr class="p-0 m-0">
+        <div class="max-w-[50vw]"><b>Support Summary:</b> ${summary[support]}</div>
         <hr class="p-0 m-0">
         <div><b>LGAs Supported:</b> ${val[1]}</div>
       `;
@@ -284,6 +294,18 @@ export const useMainStore = defineStore('useMainStore', {
               }
               if(spDt.lgas_sp >0) {
                 let spIndx = t.findArrObj(ctDatSet.data.datasets, 'label', spDt.support);
+                
+                const sptExists = this.supportsSummary.some((spt) => {
+                  return spDt.support in spt && spt.partner == spDt.partner;
+                });
+
+                if(!sptExists) {
+                  t.supportsSummary.push({
+                    [spDt.support]: spDt.summary,
+                    partner: spDt.partner
+                  });
+                }
+
                 if(spIndx >= 0) {
                   ctDatSet.data.datasets[spIndx]['data'].push(spDt.lgas_sp);
                 } else {
@@ -329,12 +351,16 @@ export const useMainStore = defineStore('useMainStore', {
       for(let a = 0; a < labels.length; a++) {
         let pdt = labels[a];
         let spTypes = Object.keys(data.partners[pdt]);
+
         for(let b = 0; b < spTypes.length; b++) {
           const spt = spTypes[b];
+          
           const supportData = data.partners[pdt][spt]
+         
           t.chartCleanedData.push({
             'partner': pdt,
             'support': spt,
+            'summary': supportData.mapping_data[0].summary_of_support,
             'lgas_sp': supportData.lgas_supported,
             'status': supportData.status,
             'pat_full': supportData.partner_full_name,
@@ -617,14 +643,8 @@ export const useMainStore = defineStore('useMainStore', {
         this.initChart();
       } else if(this.view == 'ptins') {
         const that = this;
+        let partnerSummaryData = {};
         const insData = this.mapData[this.view]['data'];
-        // const insStates = Object.keys(insData);
-        // insStates.forEach((st) => {
-        //   console.log(insData[st]);
-        //   for(const lga in insData[st]) {
-        //     console.log(insData[st][])
-        //   }
-        // });
 
         Object.keys(insData).forEach((st) => {
           Object.keys(insData[st]).forEach((lg) => {
@@ -632,32 +652,25 @@ export const useMainStore = defineStore('useMainStore', {
               let prgArea = progData.program_area;
               let partner = progData.partner;
 
-              if(!that.partnerSummaryData[prgArea]) {
-                that.partnerSummaryData[prgArea] = {};
+              if(!partnerSummaryData[prgArea]) {
+                partnerSummaryData[prgArea] = {};
               }
 
-              if(!that.partnerSummaryData[prgArea][partner]) {
-                that.partnerSummaryData[prgArea][partner] = [];
+              if(!partnerSummaryData[prgArea][partner]) {
+                partnerSummaryData[prgArea][partner] = [];
               }
               
-              let hasSupport = that.partnerSummaryData[prgArea][partner]
+              let hasSupport = partnerSummaryData[prgArea][partner]
                 .some(obj => obj.type_of_support === progData.type_of_support);
               
               if(!hasSupport) {
-                that.partnerSummaryData[prgArea][partner].push(progData);
+                partnerSummaryData[prgArea][partner].push(progData);
               }
-              // {
-              //   support: progData.type_of_support,
-              //   start_date: progData.start_date,
-              //   end_date: progData.end_date,
-              //   status: progData.status
-              // }
             });
           });
-        }); 
+        });  
 
-        // console.log(this.partnerSummaryData);
-        // console.log(this.mapData[this.view]);  
+        that.partnerSummaryData = partnerSummaryData;
       }
 
       this.isLaoding = false;

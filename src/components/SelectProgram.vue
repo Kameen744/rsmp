@@ -2,7 +2,7 @@
   <template class="min-[3rem]: flex justify-start">
     <div class="relative dropdown dropdown-bottom" @click="toggleDroped" @mouseleave="dropped=false">
       <!-- <span class="absolute top-[-5px] left-1/2 -translate-x-1/2 bg-blue-600 rounded text-white border-0 text-xs px-2 pb-1">Program Area</span> -->
-      <SelectBadge title="Program Areas" v-if="selectedPrograms[view].length > 0"></SelectBadge>
+      <SelectBadge title="Program Area" v-if="selectedPrograms[view].length > 0"></SelectBadge>
       <div tabindex="0" role="button" class="inline-flex justify-between shadow-sm p-3 m-1 pl-3 text-lg rounded border-2 border-rsmp-sec min-w-36">
         <div class="inline-flex max-w-28 overflow-hidden">
           <div class="text-nowrap">

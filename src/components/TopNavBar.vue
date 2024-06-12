@@ -47,8 +47,8 @@ const logginOut = ref(false);
 
 const links = [
   {name: 'map', title: 'Map View'},
-  {name: 'ptins', title: 'Parnter Summary'},
-  {name: 'chart', title: 'Partner Dashboard'},
+  {name: 'ptins', title: 'Support Summary'},
+  {name: 'chart', title: 'Dashboard'},
   // {name: 'cso', title: 'CSO Dashboard'},
 ]
 
@@ -60,7 +60,7 @@ const changeView = async (v) => {
   selectedSupports.value[v] = [];
   selectedStatus.value[v] = ['Ongoing'];
 
-  if(v == 'map') {
+  if(v == 'map' || v == 'ptins') {
     selectedPrograms.value[v] = ['Routine Immunization'];
   } else {
     if(v=='cso') {
